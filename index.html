@@ -219,6 +219,14 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  .guide{width:min(360px,calc(100% - 20px))}
 }
 .app.immersive .banner,.app.immersive .hint{display:none}
+/* phones (portrait or landscape): controls stretch across the whole width; PC keeps the floating island */
+@media(max-width:900px),(pointer:coarse) and (max-height:500px){
+ .app.ov .bar,.app:not(.noguide) .bar{left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));width:auto;max-width:none;transform:none;justify-content:space-between;padding:5px 4px}
+ .app.ov .bar .cbtn,.app.ov .bar .vol{flex:1 1 0}
+ .app.ov .bar .vol .cbtn{width:100%}
+ .app.ov .bar select{flex:none}
+ .app.ov.noguide .stage.idleui:not(.sheet) .bar{transform:translateY(24px)}
+}
 .install{display:none}.can-install .install{display:inline-flex}
 .touch .row:hover{background:transparent}
 .hint{position:absolute;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);font-size:13px;color:#fff;background:rgba(30,30,36,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:8px 14px;border-radius:14px;pointer-events:none;text-align:center;line-height:1.4;width:max-content;max-width:calc(100% - 32px);transition:opacity .4s}
