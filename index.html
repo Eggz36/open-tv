@@ -51,7 +51,7 @@ button{cursor:pointer}
 .app.ov.noguide .stage.idleui:not(.sheet) .bar{opacity:0;transform:translate(-50%,24px);pointer-events:none}
 .app.ov.noguide .stage.idleui:not(.sheet){cursor:none}
 .app.ov .banner{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
-.app.ov .stage.sheet #bSheet svg{transform:rotate(180deg)}
+.app.ov .stage.sheet #bSheet{background:rgba(255,255,255,.2)}
 /* details as a frosted sheet that slides up over the video */
 .app.ov .info{position:absolute;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));width:min(820px,calc(100% - 20px));max-height:min(62%,560px);overflow:auto;z-index:4;border-radius:24px;padding:22px;color:#fff;
  background:rgba(30,30,36,.5);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
@@ -220,6 +220,8 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  .guide{width:min(360px,calc(100% - 20px))}
 }
 .app.immersive .banner,.app.immersive .hint{display:none}
+.ios .vol input{display:none!important}
+.ios .tbar .vol{padding-right:0}
 /* captions & quality menu */
 .pop{position:absolute;z-index:5;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translate(-50%,12px);width:min(280px,calc(100% - 20px));max-height:min(60%,420px);overflow:auto;padding:12px;border-radius:20px;color:#fff;
  background:rgba(30,30,36,.55);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
@@ -232,12 +234,27 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 .pop .none{padding:6px 12px 10px;font-size:13px;color:rgba(255,255,255,.6)}
 #quality{display:none!important}
 #bCC.empty,#bQ.empty{opacity:.45}
-video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",system-ui,sans-serif}
+.subs{position:absolute;z-index:2;left:5%;right:5%;bottom:8%;text-align:center;pointer-events:none;line-height:1.38;font-family:var(--cf);color:var(--cc);transition:bottom .3s}
+.subs span{display:inline;background:var(--cb);padding:.06em .42em;border-radius:.22em;-webkit-box-decoration-break:clone;box-decoration-break:clone;text-shadow:var(--csh);font-weight:var(--cw,500)}
+.subs.preview span{outline:1px dashed rgba(255,255,255,.35)}
+video::cue{color:transparent;background:transparent;text-shadow:none}
+.pop .seg{display:flex;flex-wrap:wrap;gap:5px;padding:2px 6px 10px}
+.pop .seg button{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 11px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;font-size:13px}
+.pop .seg button.sel{background:#fff;color:#111;border-color:#fff}
+.pop .seg i{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid rgba(0,0,0,.3)}
+.pop .lbl{font-size:12px;color:rgba(255,255,255,.6);padding:4px 8px 4px}
+.pop .div{border-top:1px solid rgba(255,255,255,.12);margin:6px 0 4px}
+#ccPop{width:min(320px,calc(100% - 20px))}
+#bCast.on{color:var(--acc)}
+#bCast.connecting svg{animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
 /* phones (portrait or landscape): controls stretch across the whole width; PC keeps the floating island */
 @media(max-width:900px),(pointer:coarse) and (max-height:500px){
  .app.ov .bar,.app:not(.noguide) .bar{left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));width:auto;max-width:none;transform:none;justify-content:space-between;padding:5px 4px}
- .app.ov .bar .cbtn,.app.ov .bar .vol{flex:1 1 0}
- .app.ov .bar .vol .cbtn{width:100%}
+ .app.ov .bar .cbtn{flex:1 1 0}
+ .app.ov .bar .vol{flex:2.5 1 0;display:flex;align-items:center;gap:2px}
+ .app.ov .bar .vol .cbtn{flex:none}
+ html:not(.touch) .app.ov .bar .vol input{display:block;flex:1;width:auto;min-width:64px}
  .app.ov .bar select{flex:none}
  .app.ov.noguide .stage.idleui:not(.sheet) .bar{transform:translateY(24px)}
 }
@@ -304,13 +321,14 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",sys
 
  <main class="stage">
   <div class="screen idle" id="screen">
-   <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow" disableremoteplayback></video>
+   <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow"></video>
    <div class="spin" aria-hidden="true"></div>
+   <div class="subs" id="subs" aria-live="polite"></div>
    <div class="msg" id="msg"><h2 id="msgT">No signal</h2><p id="msgP">Pick a channel from the guide, or type a channel number.</p><div class="btns" id="msgB"></div></div>
    <div class="osd" id="osd"></div>
    <div class="entry" id="entry"></div>
    <div class="toast" id="toast"></div>
-   <div class="pop" id="ccPop" role="dialog" aria-label="Captions"><h3>Captions</h3><div id="ccList"></div></div>
+   <div class="pop" id="ccPop" role="dialog" aria-label="Captions"><h3>Captions</h3><div id="ccList"></div><div class="div"></div><h3>Caption style</h3><div id="ccStyle"></div></div>
    <div class="pop" id="qPop" role="dialog" aria-label="Quality"><h3>Quality</h3><div id="qList"></div></div>
    <div class="banner" id="banner"></div>
   </div>
@@ -327,7 +345,7 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",sys
    <button class="cbtn" id="bPip" title="Picture in picture" aria-label="Picture in picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><rect x="12" y="11.5" width="6.5" height="5" rx="1" fill="currentColor"/></svg></button>
    <button class="cbtn" id="bFull" title="Fullscreen (F)" aria-label="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
    <button class="cbtn on" id="bGuide" title="Show / hide channel guide (G)" aria-label="Channel guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M9.5 4.5v15M5.5 8.5h1.5M5.5 11.5h1.5M5.5 14.5h1.5" stroke-linecap="round"/></svg></button>
-   <button class="cbtn" id="bSheet" title="Show details (scroll up)" aria-label="Show details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14.5 6-6 6 6"/></svg></button>
+   <button class="cbtn" id="bSheet" title="Channel details (scroll up)" aria-label="Channel details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 13.5h18"/><path d="M6.5 16.5h7" stroke-linecap="round"/></svg></button>
    <button class="cbtn" id="bHelp" title="Shortcuts (?)" aria-label="Help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></button>
   </div>
   <section class="info" id="info"></section>
@@ -387,6 +405,8 @@ const opt=Object.assign({skip:true,geo:false,not247:false,nsfw:false,http:locati
 const NATIVE=!!document.createElement('video').canPlayType('application/vnd.apple.mpegurl')&&/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)&&!/Chrome|Android/.test(navigator.userAgent);
 const TOUCH=matchMedia('(pointer: coarse)').matches;if(TOUCH)document.documentElement.classList.add('touch');
 const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
+if(IOS)document.documentElement.classList.add('ios');
+const APPLE_WEB=IOS||(/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|Edg|Android/.test(navigator.userAgent));
 function updPhone(){document.documentElement.classList.toggle('phone',TOUCH&&(innerWidth<=900||innerHeight<=500))}
 updPhone();addEventListener('resize',updPhone);
 const PHONE=()=>document.documentElement.classList.contains('phone'),SMALL=()=>PHONE()||innerWidth<=900;
@@ -497,7 +517,7 @@ function scrollToCur(){
 }
 
 // ---------- screen states: dark screen + spinner while tuning or buffering ----------
-function setScreen(state){const s=$('screen');s.classList.remove('tuning','nosig','idle','cast','buffering');if(state)s.classList.add(state)}
+function setScreen(state){const s=$('screen');s.classList.remove('tuning','nosig','idle','cast','buffering');if(state)s.classList.add(state);else if(video.webkitCurrentPlaybackTargetIsWireless){s.classList.add('cast');if(cur){$('msgT').textContent='Playing on AirPlay';$('msgP').textContent=cur.name+' is on your TV. Change channels here; to stop, tap AirPlay and choose this device.'}}}
 
 // ---------- OSD / banner ----------
 let osdT,banT,toastT;
@@ -514,7 +534,7 @@ function toast(t){$('toast').textContent=t;$('toast').classList.add('show');clea
 // ---------- player ----------
 const video=$('video');
 video.volume=store.get('vol',0.8);video.muted=store.get('muted',false);
-function stopPlayer(){if(hls){hls.destroy();hls=null}video.removeAttribute('src');video.load();clearTimeout(tuneTimer)}
+function stopPlayer(){if(typeof ccTrack!=='undefined'&&ccTrack){ccTrack.oncuechange=null;ccTrack=null;$('subs').innerHTML=''}if(hls){hls.destroy();hls=null}video.removeAttribute('src');video.load();clearTimeout(tuneTimer)}
 // ---------- best-source picker ----------
 const health=store.get('health',{});
 function saveHealth(u,v){health[u]=[v,Date.now()];const k=Object.keys(health);if(k.length>3000)delete health[k[0]];store.set('health',health)}
@@ -557,7 +577,7 @@ async function tune(g,si=null,opts={}){
 }
 function playSource(){
  pickSeq++;mediaMeta();
- if(casting()){tuneId++;banner();renderSources();castLoad();return}
+ if(casting()){tuneId++;banner();renderSources();castLoad(true);return}
  const id=++tuneId,g=cur,s=g.sources[curSrc];
  stopPlayer();setScreen('tuning');banner();renderSources();
  $('quality').innerHTML='<option value="-1">Auto</option>';renderQ();
@@ -650,10 +670,10 @@ $('list').addEventListener('click',e=>{const r=e.target.closest('.row');if(r){su
 $('info').addEventListener('click',e=>{const s=e.target.closest('[data-src]');if(s){curSrc=+s.dataset.src;tried=new Set();playSource()}if(e.target.closest('[data-a=copy]'))copyUrl()});
 $('msgB').addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='retry'){surfing=false;tune(cur,null,{retry:1})}if(a==='copy')copyUrl();if(a==='next'){step(1)}});
 function recall(){if(last){surfing=false;const l=last;last=cur;tune(l,null,{keepLast:1})}else toast('No previous channel')}
-$('bPlay').onclick=()=>video.paused?video.play().catch(()=>{}):video.pause();
-$('bMute').onclick=()=>{video.muted=!video.muted;if(!video.muted&&video.volume===0)video.volume=.5;updateMute()};
+$('bPlay').onclick=()=>{if(casting()&&rpc){rpc.playOrPause();return}video.paused?video.play().catch(()=>{}):video.pause()};
+$('bMute').onclick=()=>{if(casting()&&rpc){rpc.muteOrUnmute();return}video.muted=!video.muted;if(!video.muted&&video.volume===0)video.volume=.5;updateMute()};
 let iosVolTold=false;
-$('vol').oninput=e=>{const v=+e.target.value;video.volume=v;video.muted=v===0;updateMute();
+$('vol').oninput=e=>{const v=+e.target.value;if(casting()&&rp){rp.volumeLevel=v;rpc.setVolumeLevel();if(rp.isMuted&&v>0)rpc.muteOrUnmute();return}video.volume=v;video.muted=v===0;updateMute();
  if(IOS&&v>0&&!iosVolTold){iosVolTold=true;toast('On iPhone, set loudness with the side buttons')}};
 $('quality').onchange=e=>{if(hls){hls.currentLevel=+e.target.value;toast('Quality: '+e.target.selectedOptions[0].textContent)}};
 $('bFav').onclick=toggleFav;
@@ -688,7 +708,7 @@ $('bFull').onclick=()=>{
   const p=req.call(stage,{navigationUI:'hide'});
   Promise.resolve(p).then(()=>{if(TOUCH)screen.orientation?.lock?.('landscape').catch(()=>{})}).catch(()=>setImmersive(true))}
  else{setImmersive(true);if(!navigator.standalone)toast('Tip: add Open TV to your Home Screen to hide Safari’s bars')}};
-video.disableRemotePlayback=true;
+if(!APPLE_WEB)video.disableRemotePlayback=true; // hides Chrome's own overlay cast icon; Apple keeps AirPlay
 video.addEventListener('webkitbeginfullscreen',()=>{try{video.webkitExitFullscreen()}catch{}});
 $('screen').addEventListener('dblclick',()=>$('bFull').click());
 $('screen').addEventListener('mousemove',()=>{if(!TOUCH&&cur&&!$('banner').classList.contains('show'))banner()});
@@ -761,46 +781,67 @@ function mediaMeta(){
 if('mediaSession' in navigator){const ms=navigator.mediaSession,h=(a,f)=>{try{ms.setActionHandler(a,f)}catch{}};
  h('play',()=>video.play().catch(()=>{}));h('pause',()=>video.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>video.pause())}
 
-// ---------- casting: Chromecast / Google TV (Chrome on PC + Android), AirPlay (iPhone / Mac Safari) ----------
-let castCtx=null,castName='';
+// ---------- casting: Chromecast / Google TV (Chrome & Edge on PC + Android), AirPlay (iPhone, iPad, Mac Safari) ----------
+// Works like YouTube: the button appears when a TV is on your Wi-Fi, the TV plays the stream itself, and this app becomes the remote.
+let castCtx=null,castName='your TV',rp=null,rpc=null,castSeq=0,castTried=new Set();
 const casting=()=>!!(castCtx&&castCtx.getCurrentSession());
 window.__onGCastApiAvailable=ok=>{
  if(!ok||!window.cast||!cast.framework)return;
  castCtx=cast.framework.CastContext.getInstance();
- castCtx.setOptions({receiverApplicationId:chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,autoJoinPolicy:chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED});
- $('bCast').hidden=false;
+ castCtx.setOptions({receiverApplicationId:chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,autoJoinPolicy:chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,resumeSavedSession:true});
+ rp=new cast.framework.RemotePlayer();rpc=new cast.framework.RemotePlayerController(rp);
+ const CS=cast.framework.CastState;
+ const showState=st=>{const b=$('bCast');b.hidden=st===CS.NO_DEVICES_AVAILABLE;b.classList.toggle('on',st===CS.CONNECTED);b.classList.toggle('connecting',st===CS.CONNECTING);
+  b.title=st===CS.CONNECTED?'Casting to '+castName+' (tap to stop or switch)':'Cast to TV'};
+ castCtx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED,e=>showState(e.castState));showState(castCtx.getCastState());
  castCtx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED,e=>{
   const S=cast.framework.SessionState;
-  if(e.sessionState===S.SESSION_STARTED||e.sessionState===S.SESSION_RESUMED){castName=e.session.getCastDevice().friendlyName||'your TV';$('bCast').classList.add('on');if(cur)castLoad()}
-  if(e.sessionState===S.SESSION_ENDED){$('bCast').classList.remove('on');toast('Stopped casting');if(cur)tune(cur,curSrc,{retry:1});else setScreen('idle')}
+  if(e.sessionState===S.SESSION_STARTED||e.sessionState===S.SESSION_RESUMED){castName=e.session.getCastDevice().friendlyName||'your TV';toast('Connected to '+castName);if(cur&&e.sessionState===S.SESSION_STARTED)castLoad(true);else if(cur)castScreen()}
+  if(e.sessionState===S.SESSION_ENDED){toast('Stopped casting');if(cur)tune(cur,curSrc,{retry:1});else setScreen('idle')}
  });
+ rpc.addEventListener(cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED,()=>{if(casting())$('bPlay').innerHTML=rp.isPaused?ICON.play:ICON.pause});
+ rpc.addEventListener(cast.framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED,()=>{if(casting()&&document.activeElement!==$('vol'))$('vol').value=rp.volumeLevel});
+ rpc.addEventListener(cast.framework.RemotePlayerEventType.IS_MUTED_CHANGED,()=>{if(casting())$('bMute').innerHTML=rp.isMuted?ICON.mute:ICON.vol});
 };
-function castLoad(){
+// The TV needs to know whether the stream is made of .ts or fMP4 pieces, so peek at the playlist first.
+async function hlsFormat(url){try{let t=await (await fetch(url,{referrerPolicy:'no-referrer'})).text();
+ if(/#EXT-X-STREAM-INF/.test(t)){const m=t.split('\n').find(l=>l.trim()&&!l.startsWith('#'));if(m)t=await (await fetch(new URL(m.trim(),url).href,{referrerPolicy:'no-referrer'})).text()}
+ if(/#EXT-X-MAP|\.m4s(\?|$)|\.mp4(\?|$)|\.cmf[va](\?|$)/m.test(t))return 'fmp4';if(/\.aac(\?|$)/m.test(t))return 'aac';return 'ts'}catch{return 'ts'}}
+function castScreen(){if(!cur)return;stopPlayer();setScreen('cast');
+ $('msgT').textContent='Casting to '+castName;$('msgP').textContent=`${cur.name} is on your TV. Swipe or use the guide to change channels; the play and volume buttons control the TV.`;
+ $('msgB').innerHTML='<button class="pill" data-a="castsrc">Try another source</button><button class="pill red" data-a="caststop">Stop casting</button>'}
+async function castLoad(fresh){
  const sess=castCtx&&castCtx.getCurrentSession();if(!sess||!cur)return;
- const g=cur,s=g.sources[curSrc],hlsish=/m3u8/i.test(s.url)||!/\.(mp4|webm)(\?|$)/i.test(s.url);
- const mi=new chrome.cast.media.MediaInfo(s.url,hlsish?'application/x-mpegURL':'video/mp4');
- mi.streamType=chrome.cast.media.StreamType.LIVE;
- if(hlsish){try{mi.hlsSegmentFormat=chrome.cast.media.HlsSegmentFormat.TS;mi.hlsVideoSegmentFormat=chrome.cast.media.HlsVideoSegmentFormat.MPEG2_TS}catch{}}
- const md=new chrome.cast.media.GenericMediaMetadata();md.title=g.name;md.subtitle='Channel '+g.n+(sub(g)?' · '+sub(g):'');
+ const id=++castSeq,g=cur;if(fresh)castTried=new Set();castTried.add(curSrc);
+ const s=g.sources[curSrc],hlsish=/m3u8/i.test(s.url)||!/\.(mp4|webm)(\?|$)/i.test(s.url);
+ castScreen();$('msgP').textContent=`Sending ${g.name} to ${castName}…`;
+ const fmt=hlsish?await hlsFormat(s.url):'mp4';if(id!==castSeq||cur!==g)return;
+ const M=chrome.cast.media,mi=new M.MediaInfo(s.url,hlsish?'application/x-mpegURL':'video/mp4');
+ mi.streamType=M.StreamType.LIVE;
+ if(hlsish){try{mi.hlsSegmentFormat=fmt==='fmp4'?M.HlsSegmentFormat.FMP4:fmt==='aac'?M.HlsSegmentFormat.AAC:M.HlsSegmentFormat.TS;
+  mi.hlsVideoSegmentFormat=fmt==='fmp4'?M.HlsVideoSegmentFormat.FMP4:M.HlsVideoSegmentFormat.MPEG2_TS}catch{}}
+ const md=new M.GenericMediaMetadata();md.title=g.name;md.subtitle='Open TV · Channel '+g.n+(sub(g)?' · '+sub(g):'');
  md.images=[new chrome.cast.Image(g.logo||new URL('icon-512.png',location.href).href)];mi.metadata=md;
- const req=new chrome.cast.media.LoadRequest(mi);req.autoplay=true;
- stopPlayer();setScreen('cast');
- $('msgT').textContent='Casting';$('msgP').textContent=`${g.name} is playing on ${castName}. Swipe or use the guide to change channels on the TV.`;
- $('msgB').innerHTML='<button class="pill" data-a="castsrc">Try another source</button><button class="pill red" data-a="caststop">Stop casting</button>';
- sess.loadMedia(req).then(()=>toast('Casting '+g.name),()=>{toast('Your TV couldn’t play this stream');$('msgP').textContent=`${castName} couldn’t play this source of ${g.name}. Try another source or channel.`});
-}
+ const req=new M.LoadRequest(mi);req.autoplay=true;
+ sess.loadMedia(req).then(()=>{if(id!==castSeq)return;castScreen();toast(g.name+' is playing on '+castName)},()=>{if(id!==castSeq)return;
+  const nx=(g.order||rankBase(g)).find(i=>!castTried.has(i));
+  if(nx!=null){curSrc=nx;toast('Trying another source on the TV…');castLoad(false);return}
+  castScreen();$('msgP').textContent=`${castName} couldn’t play ${g.name}. Some channels only work on this device. Try another channel.`})}
 $('msgB').addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;
- if(a==='caststop')castCtx?.endCurrentSession(true);
- if(a==='castsrc'&&cur){const o=cur.order||rankBase(cur);curSrc=o[(o.indexOf(curSrc)+1)%o.length];castLoad()}});
-// AirPlay on Apple devices
+ if(a==='caststop'){if(castCtx)castCtx.endCurrentSession(true);else if(video.webkitShowPlaybackTargetPicker)video.webkitShowPlaybackTargetPicker()}
+ if(a==='castsrc'&&cur&&casting()){const o=cur.order||rankBase(cur);curSrc=o[(o.indexOf(curSrc)+1)%o.length];castLoad(false)}});
+// AirPlay on Apple devices: always offered, and the app shows when the picture is on the TV
+if(APPLE_WEB&&video.webkitShowPlaybackTargetPicker){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title='AirPlay';$('bCast').setAttribute('aria-label','AirPlay')}
 if(window.WebKitPlaybackTargetAvailabilityEvent){
- video.addEventListener('webkitplaybacktargetavailabilitychanged',e=>{if(e.availability==='available'&&!castCtx){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title='AirPlay'}});
- video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged',()=>$('bCast').classList.toggle('on',!!video.webkitCurrentPlaybackTargetIsWireless));
+ video.addEventListener('webkitplaybacktargetavailabilitychanged',e=>{if(!castCtx){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title=e.availability==='available'?'AirPlay':'AirPlay (no devices found yet)'}});
+ video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged',()=>{const on=!!video.webkitCurrentPlaybackTargetIsWireless;$('bCast').classList.toggle('on',on);
+  if(on&&cur){$('screen').classList.add('cast');$('msgT').textContent='Playing on AirPlay';$('msgP').textContent=`${cur.name} is on your TV. Change channels here; to stop, tap AirPlay and choose this device.`;$('msgB').innerHTML='<button class="pill red" data-a="caststop">Choose device</button>'}
+  else $('screen').classList.remove('cast')});
 }
 $('bCast').onclick=()=>{
  if(castCtx){castCtx.requestSession().catch(()=>{});return}
- if(video.webkitShowPlaybackTargetPicker){if(!cur){toast('Start a channel first');return}video.webkitShowPlaybackTargetPicker();return}
- toast('Casting works in Chrome on PC and Android, or Safari on iPhone')};
+ if(video.webkitShowPlaybackTargetPicker){if(!cur){toast('Start a channel first, then AirPlay it');return}video.webkitShowPlaybackTargetPicker();return}
+ toast('Casting works in Chrome or Edge (PC, Android) and AirPlay in Safari')};
 
 // ---------- install as an app (Android / Chrome / Edge) ----------
 let installEvt=null;
@@ -834,9 +875,38 @@ swipeClose($('info'),1,()=>{if(PHONE())closeSheet()});
 // ---------- captions and quality menus ----------
 let ccPref=store.get('cc',false);
 const ccTracks=()=>[...(video.textTracks||[])].filter(t=>t.kind==='captions'||t.kind==='subtitles');
-function setCC(i){ccTracks().forEach((t,j)=>t.mode=j===i?'showing':'disabled');if(hls)hls.subtitleDisplay=i>=0;ccPref=i>=0;store.set('cc',ccPref);renderCC()}
+let ccTrack=null;
+// Captions are drawn by Open TV itself (centred on the picture, styled from the menu); the browser's own caption drawing is hidden.
+function setCC(i,save=true){const ts=ccTracks();ccTrack=i>=0?ts[i]||null:null;
+ ts.forEach(t=>{if(t!==ccTrack)t.mode='disabled'});
+ if(ccTrack){ccTrack.mode=hls?'showing':'hidden';ccTrack.oncuechange=drawSubs}
+ if(hls)hls.subtitleDisplay=!!ccTrack;if(save){ccPref=!!ccTrack;store.set('cc',ccPref)}drawSubs();renderCC()}
+const CCS={size:{s:['S',.8],m:['M',1],l:['L',1.3],xl:['XL',1.65]},
+ color:{white:['White','#ffffff'],yellow:['Yellow','#ffe14d'],cyan:['Cyan','#6fe7ff'],green:['Green','#7dff9a']},
+ bg:{box:['Box','rgba(0,0,0,.75)'],soft:['See-through','rgba(0,0,0,.42)'],none:['Outline','transparent']},
+ font:{sans:['Modern','"Space Grotesk",system-ui,sans-serif'],classic:['Classic','Helvetica,Arial,sans-serif'],serif:['Serif','Georgia,"Times New Roman",serif'],bold:['Bold','"Space Grotesk",system-ui,sans-serif']}};
+let ccStyle=Object.assign({size:'m',color:'white',bg:'box',font:'sans'},store.get('ccStyle',{}));
+for(const k in CCS)if(!CCS[k][ccStyle[k]])ccStyle[k]=Object.keys(CCS[k])[k==='size'?1:0];
+function applyCCStyle(){const sb=$('subs').style,st=ccStyle;
+ sb.setProperty('--cc',CCS.color[st.color][1]);sb.setProperty('--cb',CCS.bg[st.bg][1]);sb.setProperty('--cf',CCS.font[st.font][1]);
+ sb.setProperty('--cw',st.font==='bold'?700:500);
+ sb.setProperty('--csh',st.bg==='none'?'0 0 3px #000,0 0 3px #000,0 1px 2px #000,0 0 8px rgba(0,0,0,.8)':'none');placeSubs()}
+let subsPreview=false;
+function drawSubs(){const lines=[];
+ if(ccTrack&&ccTrack.mode!=='disabled'&&ccTrack.activeCues)for(const c of ccTrack.activeCues)lines.push(...String(c.text||'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').split(/\n/));
+ const show=lines.filter(l=>l.trim());const pv=!show.length&&subsPreview;
+ $('subs').classList.toggle('preview',pv);
+ $('subs').innerHTML=(pv?['This is how captions will look','on Open TV']:show).map(l=>`<span>${esc(l)}</span>`).join('<br>')}
+function placeSubs(){const sc=$('screen'),W=sc.clientWidth,H=sc.clientHeight;if(!W||!H)return;
+ const vw=video.videoWidth||16,vh=video.videoHeight||9,ch=Math.min(H,W*vh/vw),cw=Math.min(W,H*vw/vh);
+ const ctrl=document.querySelector('.stage').classList.contains('idleui')?0:(PHONE()?82:92);
+ const sb=$('subs').style;sb.bottom=Math.max((H-ch)/2+ch*.07,ctrl+8)+'px';sb.left=sb.right=Math.max((W-cw)/2+cw*.06,12)+'px';
+ sb.fontSize=Math.max(13,Math.min(40,cw*.042))*CCS.size[ccStyle.size][1]+'px'}
+function renderCCStyle(){const row=(k,label)=>`<div class="lbl">${label}</div><div class="seg">`+Object.entries(CCS[k]).map(([v,[name,val]])=>
+  `<button class="${ccStyle[k]===v?'sel':''}" data-cs="${k}:${v}">${k==='color'?`<i style="background:${val}"></i>`:''}${esc(name)}</button>`).join('')+'</div>';
+ $('ccStyle').innerHTML=row('size','Size')+row('color','Text colour')+row('bg','Background')+row('font','Font')}
 function renderCC(){
- const ts=ccTracks(),on=ts.findIndex(t=>t.mode==='showing');
+ const ts=ccTracks(),on=ccTrack&&ccTrack.mode!=='disabled'?ts.indexOf(ccTrack):-1;
  $('bCC').classList.toggle('on',on>=0);$('bCC').classList.toggle('empty',!ts.length);
  $('ccList').innerHTML=`<button class="opt${on<0?' sel':''}" data-cc="-1">Off</button>`+ts.map((t,j)=>`<button class="opt${on===j?' sel':''}" data-cc="${j}">${esc(t.label||(t.language&&langs.get(t.language)?.name)||t.language||('Captions '+(j+1)))}</button>`).join('')+(ts.length?'':'<div class="none">This channel doesn’t send captions.</div>');
 }
@@ -846,18 +916,21 @@ function renderQ(){
  $('qList').innerHTML=lv.length>1?`<button class="opt${hls.autoLevelEnabled?' sel':''}" data-q="-1">Auto</button>`+lv.map((l,i)=>`<button class="opt${!hls.autoLevelEnabled&&hls.currentLevel===i?' sel':''}" data-q="${i}">${l.height?l.height+'p':Math.round((l.bitrate||0)/1000)+' kbps'}</button>`).join(''):'<div class="none">Only one quality for this channel.</div>';
 }
 if(video.textTracks&&video.textTracks.addEventListener)['addtrack','removetrack','change'].forEach(ev=>video.textTracks.addEventListener(ev,()=>{
- if(ev==='addtrack'&&ccPref){const ts=ccTracks();if(ts.length&&!ts.some(t=>t.mode==='showing'))ts[0].mode='showing'}renderCC()}));
+ if(ev==='addtrack'&&ccPref&&(!ccTrack||ccTrack.mode==='disabled')){const ts=ccTracks();if(ts.length){setCC(0,false);return}}renderCC()}));
 const popOpen=()=>$('ccPop').classList.contains('show')||$('qPop').classList.contains('show');
-function closePop(){$('ccPop').classList.remove('show');$('qPop').classList.remove('show')}
+function closePop(){$('ccPop').classList.remove('show');$('qPop').classList.remove('show');if(subsPreview){subsPreview=false;drawSubs()}}
 function togglePop(id){const open=!$(id).classList.contains('show');closePop();if(open)$(id).classList.add('show');wake()}
-$('bCC').onclick=e=>{e.stopPropagation();renderCC();togglePop('ccPop')};
+$('bCC').onclick=e=>{e.stopPropagation();renderCC();renderCCStyle();togglePop('ccPop');subsPreview=$('ccPop').classList.contains('show');drawSubs()};
+$('ccStyle').addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-cs]');if(!b)return;const [k,v]=b.dataset.cs.split(':');
+ ccStyle[k]=v;store.set('ccStyle',ccStyle);applyCCStyle();renderCCStyle();drawSubs()});
 $('bQ').onclick=e=>{e.stopPropagation();renderQ();togglePop('qPop')};
 $('ccPop').addEventListener('click',e=>{e.stopPropagation();const c=e.target.closest('[data-cc]');if(c){setCC(+c.dataset.cc);setTimeout(closePop,150)}});
 $('qPop').addEventListener('click',e=>{e.stopPropagation();const q=e.target.closest('[data-q]');
  if(q&&hls){hls.currentLevel=+q.dataset.q;$('quality').value=q.dataset.q;renderQ();toast('Quality: '+q.textContent);setTimeout(closePop,150)}});
 document.addEventListener('click',e=>{if(!e.target.closest('.pop,#bCC,#bQ'))closePop()});
-renderCC();renderQ();
-if(video.webkitShowPlaybackTargetPicker&&!/Chrome|CriOS|Android/.test(navigator.userAgent)){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title='AirPlay';$('bCast').setAttribute('aria-label','AirPlay')}
+renderCC();renderQ();applyCCStyle();
+addEventListener('resize',placeSubs);video.addEventListener('loadedmetadata',placeSubs);video.addEventListener('resize',placeSubs);
+new MutationObserver(placeSubs).observe(document.querySelector('.stage'),{attributes:true,attributeFilter:['class']});
 
 // phones: move fullscreen + PiP to the top-left and cast + volume to the top-right, like the iPhone player
 const barEl=document.querySelector('.bar');
