@@ -197,9 +197,31 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  .osd{top:10px;right:14px}
 }
 .touch .vol input{display:none}
+/* phones & tablets: same frosted player as PC, sized to fit; swipe up replaces the arrow button */
+.touch #bSheet,.touch #bHelp{display:none}
+.touch select,.touch input{font-size:16px}
+.touch body,.touch .screen{touch-action:manipulation}
+.touch .screen{touch-action:none}
+@media(max-width:900px){
+ .app.ov .bar{padding:5px;gap:0;bottom:calc(10px + env(safe-area-inset-bottom));border-radius:26px}
+ .app.ov .bar .cbtn{min-width:40px;height:42px;padding:0 8px}
+ .app.ov .bar select{max-width:88px;height:34px;font-size:14px;padding:0 4px}
+ .cbtn svg{width:21px;height:21px}
+ .app.ov .info{bottom:calc(68px + env(safe-area-inset-bottom));max-height:min(64%,560px)}
+ .app.ov .banner{padding-bottom:calc(74px + env(safe-area-inset-bottom))}
+ .guide{bottom:calc(72px + env(safe-area-inset-bottom))}
+ .osd{font-size:clamp(40px,12vw,64px)}
+ .msg h2{font-size:clamp(34px,11vw,56px)}
+ .msg p{font-size:14px}
+}
+@media(max-height:500px) and (orientation:landscape){
+ .app.ov .info{max-height:calc(100% - 90px)}
+ .guide{width:min(360px,calc(100% - 20px))}
+}
+.app.immersive .banner,.app.immersive .hint{display:none}
 .install{display:none}.can-install .install{display:inline-flex}
 .touch .row:hover{background:transparent}
-.hint{position:absolute;left:50%;bottom:calc(84px + env(safe-area-inset-bottom));transform:translateX(-50%);font-size:12.5px;color:#ddd;background:rgba(0,0,0,.6);padding:5px 12px;border-radius:12px;pointer-events:none;white-space:nowrap}
+.hint{position:absolute;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);font-size:13px;color:#fff;background:rgba(30,30,36,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:8px 14px;border-radius:14px;pointer-events:none;text-align:center;line-height:1.4;width:max-content;max-width:calc(100% - 32px);transition:opacity .4s}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -236,7 +258,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 
  <main class="stage">
   <div class="screen idle" id="screen">
-   <video id="video" playsinline x-webkit-airplay="allow"></video>
+   <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow" disableremoteplayback></video>
    <canvas id="noise" width="160" height="90"></canvas>
    <div class="msg" id="msg"><h2 id="msgT">NO SIGNAL</h2><p id="msgP">Pick a channel from the guide, or type a channel number.</p><div class="btns" id="msgB"></div></div>
    <div class="osd" id="osd"></div>
@@ -270,6 +292,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  <label class="chk"><input type="checkbox" id="oHttp"> Hide plain-http streams (fewer failures in some browsers)</label>
  <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
   <button class="pill red install" id="bInstall">Install app</button>
+  <button class="pill" id="bHelp2">Gestures &amp; shortcuts</button>
   <button class="pill" id="bM3u">Download filtered list as .m3u</button>
   <button class="pill" id="bReload">Refresh database</button>
   <button class="pill red" data-close>Done</button>
@@ -288,8 +311,11 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
   <kbd>M</kbd><span>Mute</span><kbd>+ / −</kbd><span>Volume</span>
   <kbd>S</kbd><span>Favorite this channel</span>
   <kbd>R</kbd><span>Random channel</span>
-  <kbd>Scroll ↑ / swipe up on controls</kbd><span>Slide up the channel details</span>
-  <kbd>Swipe ↑ / ↓ on video</kbd><span>Next / previous channel</span>
+  <kbd>Scroll ↑</kbd><span>Slide up the channel details</span>
+  <kbd>Tap video</kbd><span>Show / hide the controls (phone)</span>
+  <kbd>Swipe ↑ with controls showing</kbd><span>Slide up the channel details (phone)</span>
+  <kbd>Swipe ↑ / ↓, controls hidden</kbd><span>Next / previous channel (phone)</span>
+  <kbd>Swipe sideways</kbd><span>Back to last channel (phone)</span>
   <kbd>F</kbd><span>Fullscreen</span><kbd>G</kbd><span>Show / hide guide</span>
   <kbd>I</kbd><span>Show channel banner</span><kbd>/</kbd><span>Search</span>
  </div>
@@ -592,20 +618,31 @@ $('bGuide').onclick=()=>$('app').classList.contains('noguide')?openGuide():close
 document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)try{screen.orientation.unlock()}catch{}});
 // auto-hide the overlay controls when the mouse is idle
 const stage=document.querySelector('.stage');let idleT;
-function wake(e){stage.classList.remove('idleui');clearTimeout(idleT);
+function wake(e){
+ if(e&&TOUCH&&(e.type==='mousemove'||(e.type==='touchstart'&&e.target.closest&&e.target.closest('#screen'))))return; // on phones, taps on the video decide
+ stage.classList.remove('idleui');clearTimeout(idleT);
  if(e&&e.target.closest&&e.target.closest('.bar,.info'))return;
  if(stage.classList.contains('sheet'))return;
- idleT=setTimeout(()=>{if(!video.paused)stage.classList.add('idleui')},2800)}
+ idleT=setTimeout(()=>{if(!video.paused)stage.classList.add('idleui')},TOUCH?4000:2800)}
 ['mousemove','touchstart','keydown'].forEach(ev=>stage.addEventListener(ev,wake,{passive:true}));document.addEventListener('keydown',wake);
 video.addEventListener('pause',()=>stage.classList.remove('idleui'));
 
+// fullscreen always keeps Open TV's own player (never hands off to the phone's built-in one)
+const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
+function setImmersive(on){$('app').classList.toggle('immersive',on);$('bFull').classList.toggle('on',on);if(on){closeGuide();closeSheet(true);stage.classList.add('idleui')}else wake()}
+document.addEventListener('fullscreenchange',()=>setImmersive(!!fsEl()));document.addEventListener('webkitfullscreenchange',()=>setImmersive(!!fsEl()));
 $('bFull').onclick=()=>{
- if(document.fullscreenElement){document.exitFullscreen().catch(()=>{});return}
- if(stage.requestFullscreen&&!/iPhone|iPod/.test(navigator.userAgent)){
-  stage.requestFullscreen({navigationUI:'hide'}).then(()=>{if(TOUCH)screen.orientation?.lock?.('landscape').catch(()=>{})}).catch(()=>toast('Fullscreen not available'))}
- else if(video.webkitEnterFullscreen&&video.getAttribute('src'))video.webkitEnterFullscreen();else toast('Start a channel first')};
+ if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document)?.catch?.(()=>{});return}
+ if($('app').classList.contains('immersive')){setImmersive(false);return}
+ const req=stage.requestFullscreen||stage.webkitRequestFullscreen;
+ if(req&&!/iPhone|iPod/.test(navigator.userAgent)){
+  const p=req.call(stage,{navigationUI:'hide'});
+  Promise.resolve(p).then(()=>{if(TOUCH)screen.orientation?.lock?.('landscape').catch(()=>{})}).catch(()=>setImmersive(true))}
+ else{setImmersive(true);if(!navigator.standalone)toast('Tip: add Open TV to your Home Screen to hide Safari’s bars')}};
+video.disableRemotePlayback=true;
+video.addEventListener('webkitbeginfullscreen',()=>{try{video.webkitExitFullscreen()}catch{}});
 $('screen').addEventListener('dblclick',()=>$('bFull').click());
-$('screen').addEventListener('mousemove',()=>{if(cur&&!$('banner').classList.contains('show'))banner()});
+$('screen').addEventListener('mousemove',()=>{if(!TOUCH&&cur&&!$('banner').classList.contains('show'))banner()});
 $('bPip').onclick=async()=>{try{document.pictureInPictureElement?await document.exitPictureInPicture():await video.requestPictureInPicture()}catch{toast('Picture-in-picture not available')}};
 $('btnShuffle').onclick=random;
 // layers (modals + details sheet) close with the Android back button
@@ -614,7 +651,8 @@ function closeLayers(){document.querySelectorAll('.modal.show').forEach(m=>m.cla
 function popLayer(){if(history.state&&history.state.otvLayer)history.back();else closeLayers()}
 addEventListener('popstate',closeLayers);
 const openM=id=>{$(id).classList.add('show');pushLayer()};
-$('btnSettings').onclick=()=>openM('mSettings');$('bHelp').onclick=()=>openM('mHelp');
+$('btnSettings').onclick=()=>openM('mSettings');
+$('bHelp2').onclick=()=>{$('mSettings').classList.remove('show');$('mHelp').classList.add('show')};$('bHelp').onclick=()=>openM('mHelp');
 document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]'))popLayer()}));
 function openSheet(){if(!$('app').classList.contains('ov')||stage.classList.contains('sheet'))return;if(!cur){toast('Pick a channel first');return}stage.classList.add('sheet');stage.classList.remove('idleui');clearTimeout(idleT);pushLayer()}
 function closeSheet(silent){if(!stage.classList.contains('sheet'))return;if(silent){stage.classList.remove('sheet');return}popLayer()}
@@ -723,17 +761,24 @@ $('bInstall2').onclick=()=>$('bInstall').click();
 $('bInstall').onclick=async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch{}installEvt=null;document.documentElement.classList.remove('can-install')};
 // swipe: up = next channel, down = previous, sideways = last channel, tap = show info
 let ts=null;
-$('screen').addEventListener('touchstart',e=>{if(e.touches.length!==1){ts=null;return}const t=e.touches[0];ts={x:t.clientX,y:t.clientY,t:Date.now()}},{passive:true});
+// Touch: tap shows/hides the controls. With the controls showing, swipe up = details, swipe down = hide controls.
+// With the controls hidden, swipe up/down = next/previous channel. Sideways = last channel.
+$('screen').addEventListener('touchstart',e=>{if(e.touches.length!==1){ts=null;return}const t=e.touches[0];
+ ts={x:t.clientX,y:t.clientY,t:Date.now(),vis:!stage.classList.contains('idleui')||!$('app').classList.contains('noguide')}},{passive:true});
 $('screen').addEventListener('touchend',e=>{
- if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t,startY=ts.y;ts=null;
- if(stage.classList.contains('sheet')){if(Math.abs(dx)<10&&Math.abs(dy)<10||dy>50)closeSheet();return}
- const r=$('screen').getBoundingClientRect();
- if($('app').classList.contains('ov')&&!stage.classList.contains('idleui')&&dy<-40&&startY>r.bottom-130){openSheet();return}
- if(dt<700&&Math.abs(dy)>50&&Math.abs(dy)>Math.abs(dx)*1.4){e.preventDefault();step(dy<0?1:-1)}
- else if(dt<700&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.4){e.preventDefault();recall()}
- else if(Math.abs(dx)<10&&Math.abs(dy)<10&&cur){banner()}
+ if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t,vis=ts.vis;ts=null;
+ const tap=Math.abs(dx)<12&&Math.abs(dy)<12,vert=dt<800&&Math.abs(dy)>45&&Math.abs(dy)>Math.abs(dx)*1.3,horiz=dt<800&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.3;
+ if(stage.classList.contains('sheet')){if(tap||(vert&&dy>0))closeSheet();return}
+ if(!$('app').classList.contains('noguide')&&innerWidth<=900){if(tap)closeGuide();return}
+ if(tap){e.preventDefault();if(vis&&cur){clearTimeout(idleT);stage.classList.add('idleui')}else{wake();if(cur)banner()}return}
+ if(vert){e.preventDefault();
+  if(vis&&dy<0){openSheet();return}
+  if(vis&&dy>0){clearTimeout(idleT);stage.classList.add('idleui');return}
+  step(dy<0?1:-1);return}
+ if(horiz){e.preventDefault();recall()}
 });
-if(TOUCH){const h=document.createElement('div');h.className='hint';h.textContent='Swipe up/down on the video to change channel';$('screen').append(h);setTimeout(()=>h.remove(),6000)}
+if(TOUCH){const h=document.createElement('div');h.className='hint';h.innerHTML='Tap for controls · swipe up for details<br>Swipe up/down with controls hidden to change channel';$('screen').append(h);
+ setTimeout(()=>{h.style.opacity=0;setTimeout(()=>h.remove(),500)},7000)}
 // phones: start with the guide closed if there's a channel to resume, open otherwise
 setGuide(innerWidth<=900?!store.get('lastCh',''):!store.get('noguide',false),false);
 

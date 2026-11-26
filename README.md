@@ -14,9 +14,10 @@ Open TV is a free live TV app for iPhone, Android and PC. It runs from GitHub Pa
 
 | Action | Touch | Mouse / keyboard |
 |---|---|---|
-| Next / previous channel | Swipe up / down on the video | ↓ / ↑, PgDn / PgUp, or the TV remote's CH+/CH− |
+| Show / hide the controls | Tap the video | Move the mouse |
+| Next / previous channel | Swipe up / down on the video (controls hidden) | ↓ / ↑, PgDn / PgUp, or the TV remote's CH+/CH− |
 | Back to last channel | Swipe sideways | Backspace |
-| Show channel details | Swipe up on the controls, or tap ⌃ | Scroll up over the video, or click ⌃ |
+| Show channel details | Tap the video, then swipe up | Scroll up over the video, or click ⌃ |
 | Hide details again | Swipe down, or tap the video | Scroll down, or press Esc |
 | Type a channel number | – | 0–9, then Enter |
 | Try another stream source | – | → |
@@ -24,7 +25,8 @@ Open TV is a free live TV app for iPhone, Android and PC. It runs from GitHub Pa
 The video always fills the screen. The controls float over it as a frosted bar with play/pause, sound, favorite, cast, picture-in-picture, fullscreen, guide, details (⌃) and help.
 
 - **Guide button:** slides the channel list in or out as a frosted panel over the video. On a phone, it closes by itself after you pick a channel.
-- **⌃ button:** slides the channel details up over the picture.
+- **⌃ button (PC):** slides the channel details up over the picture. Phones don't need it: tap the video, then swipe up.
+- **Fullscreen:** stays in Open TV's own player on every device. On iPhone it hides everything but the video; add the app to your Home Screen to hide Safari's bars too.
 
 ## Casting to a TV
 
