@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,shrink-to-fit=no">
 <meta name="theme-color" content="#0d0d10">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -16,6 +16,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <script>
+window.__onGCastApiAvailable=function(ok){window.__castOK=ok;if(window.__castInit)window.__castInit(ok)};
 if(/Chrome|Edg\//.test(navigator.userAgent)&&!/CriOS|EdgiOS|iPhone|iPad/.test(navigator.userAgent)&&location.protocol==='https:'){const c=document.createElement('script');c.src='https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';c.async=true;document.head.appendChild(c)}
 </script>
 <style>
@@ -28,7 +29,8 @@ LAYOUT: guide column left, screen + controls + channel card right; stacks on pho
 */
 :root{--bg:#0d0d10;--panel:#16161b;--panel2:#1e1e25;--line:#2a2a33;--ink:#f2f1ee;--dim:#9a99a3;--acc:#ff3b30;--ok:#34c759;--warn:#ffb020;color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
-html,body{height:100%}
+html,body{height:100%;width:100%;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+html.touch body{position:fixed;inset:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Space Grotesk",system-ui,sans-serif;overflow:hidden}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -83,7 +85,7 @@ button{cursor:pointer}
 .guide .sub,.guide .brand .count,.guide .tab,.guide .num{color:rgba(255,255,255,.62)}
 .guide .row.cur .num{color:var(--acc)}
 /* with the guide open on a big screen, keep everything else centred in the space beside it */
-@media(min-width:901px){
+@media(min-width:901px) and (pointer:fine),(min-width:901px) and (min-height:541px){
  .app:not(.noguide) .bar,.app:not(.noguide) .toast{left:calc(50% + 205px)}
  .app:not(.noguide) .bar{max-width:calc(100% - 430px)}
  .app:not(.noguide) .info{left:calc(50% + 205px);width:min(820px,calc(100% - 440px))}
@@ -95,7 +97,18 @@ button{cursor:pointer}
 .brand .live{background:var(--acc);color:#fff;font-size:11px;font-weight:700;padding:2px 7px;border-radius:4px}
 .brand .count{margin-left:auto;color:var(--dim);font-size:13px}
 .search{margin:6px 16px;position:relative}
-.search input{width:100%;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--bg);padding:0 12px 0 36px;font-size:16px}
+.search input{width:100%;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--bg);padding:0 48px 0 36px;font-size:16px}
+.fbtn{position:absolute;right:4px;top:4px;width:34px;height:34px;border:0;border-radius:9px;background:transparent;color:rgba(255,255,255,.75);display:grid;place-items:center}
+.fbtn:hover,.fbtn.on{background:rgba(255,255,255,.14);color:#fff}
+.fbtn b{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:var(--acc);color:#fff;font-size:11px;line-height:17px;text-align:center;display:none}
+.fbtn b.n{display:block}
+.fpanel{display:none;margin:2px 12px 8px;padding:10px;border-radius:16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+.fpanel.show{display:block}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.frow label,.flbl{display:grid;gap:4px;font-size:12px;color:rgba(255,255,255,.6)}
+.flbl{margin:10px 0 2px}
+.fpanel .chips{flex-wrap:wrap;overflow:visible;padding:4px 0 2px}
+.fclear{margin-top:8px;height:34px;padding:0 12px;border-radius:17px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;font-size:13px}
 .search svg{position:absolute;left:11px;top:12px;opacity:.6}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 16px}
 select{height:38px;border-radius:9px;border:1px solid var(--line);background:var(--bg);padding:0 8px;width:100%}
@@ -152,7 +165,7 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .tag.w{background:rgba(255,176,32,.2);color:var(--warn)}
 .entry{position:absolute;left:24px;top:calc(18px + env(safe-area-inset-top));font:700 40px/1 "Space Grotesk",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);display:none}
 .entry.show{display:block}
-.toast{position:absolute;z-index:7;left:50%;top:calc(18px + env(safe-area-inset-top));transform:translateX(-50%);background:rgba(0,0,0,.8);padding:7px 14px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast{position:absolute;z-index:7;left:50%;top:calc(18px + env(safe-area-inset-top));transform:translateX(-50%);background:rgba(0,0,0,.8);padding:7px 14px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center;line-height:1.35}
 .toast.show{opacity:1}
 /* control bar */
 .bar{display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -188,7 +201,7 @@ h3{margin:0 0 8px;font-size:13px;color:var(--dim);font-weight:500}
 kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:2px 7px;white-space:nowrap}
 .chk{display:flex;gap:8px;align-items:center;padding:6px 0;font-size:14px}
 .chk input{width:18px;height:18px;accent-color:var(--acc)}
-@media(max-width:900px){
+@media(max-width:900px),(pointer:coarse) and (max-height:540px){
  .guide{bottom:calc(80px + env(safe-area-inset-bottom))}
  .info{grid-template-columns:1fr}
  .info h1{font-size:22px}
@@ -203,7 +216,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 .touch select,.touch input{font-size:16px}
 .touch body,.touch .screen{touch-action:manipulation}
 .touch .screen{touch-action:none}
-@media(max-width:900px){
+@media(max-width:900px),(pointer:coarse) and (max-height:540px){
  .app.ov .bar{padding:5px;gap:0;bottom:calc(10px + env(safe-area-inset-bottom));border-radius:26px}
  .app.ov .bar .cbtn{min-width:40px;height:42px;padding:0 8px}
  .app.ov .bar select{max-width:88px;height:34px;font-size:14px;padding:0 4px}
@@ -215,7 +228,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  .msg h2{font-size:clamp(22px,6vw,28px)}
  .msg p{font-size:14px}
 }
-@media(max-height:500px) and (orientation:landscape){
+@media(max-height:540px) and (orientation:landscape){
  .app.ov .info{max-height:calc(100% - 90px)}
  .guide{width:min(360px,calc(100% - 20px))}
 }
@@ -246,10 +259,17 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
 .pop .div{border-top:1px solid rgba(255,255,255,.12);margin:6px 0 4px}
 #ccPop{width:min(320px,calc(100% - 20px))}
 #bCast.on{color:var(--acc)}
+.pop .opt.two{min-height:54px;padding:8px 12px}
+.pop .opt.two span{display:grid;gap:2px}
+.pop .opt.two b{font-weight:600;font-size:15px}
+.pop .opt.two small{font-size:12.5px;color:rgba(255,255,255,.62);line-height:1.3}
+#castPop{width:min(330px,calc(100% - 20px))}
+.phone #castPop{top:calc(62px + env(safe-area-inset-top));bottom:auto;transform:translateY(-12px)}
+.phone #castPop.show{transform:none}
 #bCast.connecting svg{animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.35}}
 /* phones (portrait or landscape): controls stretch across the whole width; PC keeps the floating island */
-@media(max-width:900px),(pointer:coarse) and (max-height:500px){
+@media(max-width:900px),(pointer:coarse) and (max-height:540px){
  .app.ov .bar,.app:not(.noguide) .bar{left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));width:auto;max-width:none;transform:none;justify-content:space-between;padding:5px 4px}
  .app.ov .bar .cbtn{flex:1 1 0}
  .app.ov .bar .vol{flex:2.5 1 0;display:flex;align-items:center;gap:2px}
@@ -301,12 +321,14 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
   <div class="search">
    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
    <input id="q" type="search" placeholder="Search channels, networks…" autocomplete="off">
+   <button class="fbtn" id="bFilter" title="Filters" aria-label="Filters" aria-expanded="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg><b id="fCount"></b></button>
   </div>
-  <div class="filters">
-   <select id="fCountry" aria-label="Country"></select>
-   <select id="fLang" aria-label="Language"></select>
+  <div class="fpanel" id="fpanel">
+   <div class="frow"><label>Country<select id="fCountry"></select></label><label>Language<select id="fLang"></select></label></div>
+   <div class="flbl">Category</div>
+   <div class="chips" id="chips"></div>
+   <button class="fclear" id="bClearF">Clear filters</button>
   </div>
-  <div class="chips" id="chips"></div>
   <div class="tabs">
    <button class="tab on" data-tab="all">All</button>
    <button class="tab" data-tab="fav">Favorites</button>
@@ -329,6 +351,7 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
    <div class="entry" id="entry"></div>
    <div class="toast" id="toast"></div>
    <div class="pop" id="ccPop" role="dialog" aria-label="Captions"><h3>Captions</h3><div id="ccList"></div><div class="div"></div><h3>Caption style</h3><div id="ccStyle"></div></div>
+   <div class="pop" id="castPop" role="dialog" aria-label="Cast"><h3>Cast to a TV</h3><div id="castList"></div></div>
    <div class="pop" id="qPop" role="dialog" aria-label="Quality"><h3>Quality</h3><div id="qList"></div></div>
    <div class="banner" id="banner"></div>
   </div>
@@ -339,13 +362,13 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
    <div class="sp"></div>
    <select id="quality" aria-label="Quality" title="Quality"><option value="-1">Auto</option></select>
    <button class="cbtn" id="bFav" title="Favorite (S)" aria-label="Favorite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3.5 2.6 5.3 5.9.86-4.25 4.14 1 5.86L12 16.9l-5.25 2.76 1-5.86L3.5 9.66l5.9-.86z"/></svg></button>
-   <button class="cbtn" id="bCast" title="Cast to TV" aria-label="Cast to TV" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8V6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5H14"/><path d="M3 12a8 8 0 0 1 8 8M3 16a4 4 0 0 1 4 4"/><circle cx="3.5" cy="19.5" r="1" fill="currentColor"/></svg></button>
+   <button class="cbtn" id="bCast" title="Cast to a TV" aria-label="Cast to a TV"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8V6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5H14"/><path d="M3 12a8 8 0 0 1 8 8M3 16a4 4 0 0 1 4 4"/><circle cx="3.5" cy="19.5" r="1" fill="currentColor"/></svg></button>
    <button class="cbtn empty" id="bQ" title="Quality" aria-label="Quality"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg></button>
    <button class="cbtn empty" id="bCC" title="Captions" aria-label="Captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10.5 10.2a2.4 2.4 0 1 0 0 3.6M17 10.2a2.4 2.4 0 1 0 0 3.6" stroke-linecap="round"/></svg></button>
    <button class="cbtn" id="bPip" title="Picture in picture" aria-label="Picture in picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><rect x="12" y="11.5" width="6.5" height="5" rx="1" fill="currentColor"/></svg></button>
    <button class="cbtn" id="bFull" title="Fullscreen (F)" aria-label="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
    <button class="cbtn on" id="bGuide" title="Show / hide channel guide (G)" aria-label="Channel guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M9.5 4.5v15M5.5 8.5h1.5M5.5 11.5h1.5M5.5 14.5h1.5" stroke-linecap="round"/></svg></button>
-   <button class="cbtn" id="bSheet" title="Channel details (scroll up)" aria-label="Channel details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 13.5h18"/><path d="M6.5 16.5h7" stroke-linecap="round"/></svg></button>
+   <button class="cbtn" id="bSheet" title="Channel details" aria-label="Channel details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 13.5h18"/><path d="M6.5 16.5h7" stroke-linecap="round"/></svg></button>
    <button class="cbtn" id="bHelp" title="Shortcuts (?)" aria-label="Help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></button>
   </div>
   <section class="info" id="info"></section>
@@ -380,8 +403,7 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
   <kbd>M</kbd><span>Mute</span><kbd>+ / −</kbd><span>Volume</span>
   <kbd>S</kbd><span>Favorite this channel</span>
   <kbd>R</kbd><span>Random channel</span>
-  <kbd>Scroll ↑</kbd><span>Slide up the channel details</span>
-  <kbd>Tap video</kbd><span>Show / hide the controls (phone)</span>
+    <kbd>Tap video</kbd><span>Show / hide the controls (phone)</span>
   <kbd>Swipe ↑ / ↓</kbd><span>Next / previous channel (phone)</span>
   <kbd>Swipe →</kbd><span>Open the channel guide (phone)</span>
   <kbd>Swipe ←</kbd><span>Open the channel details (phone)</span>
@@ -407,7 +429,8 @@ const TOUCH=matchMedia('(pointer: coarse)').matches;if(TOUCH)document.documentEl
 const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
 if(IOS)document.documentElement.classList.add('ios');
 const APPLE_WEB=IOS||(/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|Edg|Android/.test(navigator.userAgent));
-function updPhone(){document.documentElement.classList.toggle('phone',TOUCH&&(innerWidth<=900||innerHeight<=500))}
+function updPhone(){const shortSide=Math.min(screen.width||innerWidth,screen.height||innerHeight);document.documentElement.classList.toggle('phone',TOUCH&&(shortSide<=540||innerWidth<=900||innerHeight<=540))}
+addEventListener('orientationchange',()=>setTimeout(()=>dispatchEvent(new Event('resize')),250));
 updPhone();addEventListener('resize',updPhone);
 const PHONE=()=>document.documentElement.classList.contains('phone'),SMALL=()=>PHONE()||innerWidth<=900;
 const F=Object.assign({q:'',country:'',lang:'',cat:'',tab:'all'},store.get('filters',{}));F.q='';
@@ -490,6 +513,7 @@ function applyFilters(keepScroll){
  if(F.tab==='recent')base=recents.map(id=>byId.get(id)).filter(Boolean);
  VIEW=base.filter(passes);
  $('count').textContent=VIEW.length.toLocaleString()+' channels';
+ {const n=(F.country?1:0)+(F.lang?1:0)+(F.cat?1:0);$('fCount').textContent=n||'';$('fCount').classList.toggle('n',n>0);$('bClearF').hidden=!n}
  $('spacer').style.height=VIEW.length*RH+'px';
  if(!keepScroll)$('list').scrollTop=0;
  store.set('filters',{country:F.country,lang:F.lang,cat:F.cat,tab:F.tab});
@@ -664,6 +688,8 @@ $('q').addEventListener('input',e=>{clearTimeout(qT);qT=setTimeout(()=>{F.q=e.ta
 $('fCountry').onchange=e=>{F.country=e.target.value;applyFilters()};
 $('fLang').onchange=e=>{F.lang=e.target.value;applyFilters()};
 $('chips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;F.cat=b.dataset.cat;syncUI();applyFilters()};
+$('bFilter').onclick=()=>{const on=$('fpanel').classList.toggle('show');$('bFilter').classList.toggle('on',on);$('bFilter').setAttribute('aria-expanded',on)};
+$('bClearF').onclick=()=>{F.country='';F.lang='';F.cat='';$('fCountry').value='';$('fLang').value='';syncUI();applyFilters()};
 document.querySelector('.tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(!b)return;F.tab=b.dataset.tab;syncUI();applyFilters()});
 let rafL=0;$('list').addEventListener('scroll',()=>{if(!rafL)rafL=requestAnimationFrame(()=>{rafL=0;renderList()})});
 $('list').addEventListener('click',e=>{const r=e.target.closest('.row');if(r){surfing=false;tune(VIEW[+r.dataset.i]);if(SMALL())closeGuide()}});
@@ -726,16 +752,6 @@ document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if
 function openSheet(){if(!$('app').classList.contains('ov')||stage.classList.contains('sheet'))return;if(!cur){toast('Pick a channel first');return}stage.classList.add('sheet');stage.classList.remove('idleui');clearTimeout(idleT);pushLayer()}
 function closeSheet(silent){if(!stage.classList.contains('sheet'))return;if(silent){stage.classList.remove('sheet');return}popLayer()}
 $('bSheet').onclick=()=>stage.classList.contains('sheet')?closeSheet():openSheet();
-// scroll up over the video (while the controls are showing) slides the details up; scroll down puts them away
-let wheelLock=0;
-stage.addEventListener('wheel',e=>{
- if(!$('app').classList.contains('ov')||e.target.closest('.info')||e.target.closest('.guide'))return;
- const now=Date.now();if(now<wheelLock||Math.abs(e.deltaY)<8)return;
- const open=stage.classList.contains('sheet');
- if(e.deltaY<0&&!open){openSheet();wheelLock=now+500;e.preventDefault()}
- else if(e.deltaY>0&&open){closeSheet();wheelLock=now+500;e.preventDefault()}
- else if(e.deltaY<0&&stage.classList.contains('idleui')){wake();wheelLock=now+300}
-},{passive:false});
 // swipe up on the controls bar opens the sheet; swipe down on the sheet closes it
 let bs=null;
 $('app').querySelector('.bar').addEventListener('touchstart',e=>{bs=e.touches[0].clientY},{passive:true});
@@ -781,34 +797,40 @@ function mediaMeta(){
 if('mediaSession' in navigator){const ms=navigator.mediaSession,h=(a,f)=>{try{ms.setActionHandler(a,f)}catch{}};
  h('play',()=>video.play().catch(()=>{}));h('pause',()=>video.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>video.pause())}
 
-// ---------- casting: Chromecast / Google TV (Chrome & Edge on PC + Android), AirPlay (iPhone, iPad, Mac Safari) ----------
-// Works like YouTube: the button appears when a TV is on your Wi-Fi, the TV plays the stream itself, and this app becomes the remote.
+// ---------- casting: one Cast button that offers every way to reach a TV ----------
+// Chromecast / Google TV (Chrome & Edge on PC + Android), AirPlay (Apple), the browser's own device picker, screen mirroring, or the stream link.
 let castCtx=null,castName='your TV',rp=null,rpc=null,castSeq=0,castTried=new Set();
 const casting=()=>!!(castCtx&&castCtx.getCurrentSession());
-window.__onGCastApiAvailable=ok=>{
- if(!ok||!window.cast||!cast.framework)return;
+const CAST_CAPABLE=/Chrome|Edg\//.test(navigator.userAgent)&&!/CriOS|EdgiOS|iPhone|iPad/.test(navigator.userAgent)&&location.protocol==='https:';
+function castStateName(){if(!castCtx)return '';return castCtx.getCastState()}
+function updCastBtn(){const b=$('bCast'),C=window.cast&&cast.framework&&cast.framework.CastState;
+ const st=castStateName(),air=!!video.webkitCurrentPlaybackTargetIsWireless;
+ b.classList.toggle('on',(C&&st===C.CONNECTED)||air);b.classList.toggle('connecting',!!(C&&st===C.CONNECTING));
+ b.title=(C&&st===C.CONNECTED)?'Casting to '+castName:air?'Playing on AirPlay':'Cast to a TV'}
+function initCast(ok){
+ if(castCtx||!ok||!window.cast||!cast.framework)return;
  castCtx=cast.framework.CastContext.getInstance();
  castCtx.setOptions({receiverApplicationId:chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,autoJoinPolicy:chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,resumeSavedSession:true});
  rp=new cast.framework.RemotePlayer();rpc=new cast.framework.RemotePlayerController(rp);
- const CS=cast.framework.CastState;
- const showState=st=>{const b=$('bCast');b.hidden=st===CS.NO_DEVICES_AVAILABLE;b.classList.toggle('on',st===CS.CONNECTED);b.classList.toggle('connecting',st===CS.CONNECTING);
-  b.title=st===CS.CONNECTED?'Casting to '+castName+' (tap to stop or switch)':'Cast to TV'};
- castCtx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED,e=>showState(e.castState));showState(castCtx.getCastState());
+ castCtx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED,()=>{updCastBtn();if($('castPop').classList.contains('show'))renderCastMenu()});
  castCtx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED,e=>{
   const S=cast.framework.SessionState;
   if(e.sessionState===S.SESSION_STARTED||e.sessionState===S.SESSION_RESUMED){castName=e.session.getCastDevice().friendlyName||'your TV';toast('Connected to '+castName);if(cur&&e.sessionState===S.SESSION_STARTED)castLoad(true);else if(cur)castScreen()}
   if(e.sessionState===S.SESSION_ENDED){toast('Stopped casting');if(cur)tune(cur,curSrc,{retry:1});else setScreen('idle')}
- });
+  updCastBtn()});
  rpc.addEventListener(cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED,()=>{if(casting())$('bPlay').innerHTML=rp.isPaused?ICON.play:ICON.pause});
  rpc.addEventListener(cast.framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED,()=>{if(casting()&&document.activeElement!==$('vol'))$('vol').value=rp.volumeLevel});
  rpc.addEventListener(cast.framework.RemotePlayerEventType.IS_MUTED_CHANGED,()=>{if(casting())$('bMute').innerHTML=rp.isMuted?ICON.mute:ICON.vol});
-};
+ updCastBtn();
+}
+// the Cast library may finish loading before or after this script: handle both
+window.__castInit=initCast;if(window.__castOK)initCast(true);
 // The TV needs to know whether the stream is made of .ts or fMP4 pieces, so peek at the playlist first.
 async function hlsFormat(url){try{let t=await (await fetch(url,{referrerPolicy:'no-referrer'})).text();
  if(/#EXT-X-STREAM-INF/.test(t)){const m=t.split('\n').find(l=>l.trim()&&!l.startsWith('#'));if(m)t=await (await fetch(new URL(m.trim(),url).href,{referrerPolicy:'no-referrer'})).text()}
  if(/#EXT-X-MAP|\.m4s(\?|$)|\.mp4(\?|$)|\.cmf[va](\?|$)/m.test(t))return 'fmp4';if(/\.aac(\?|$)/m.test(t))return 'aac';return 'ts'}catch{return 'ts'}}
 function castScreen(){if(!cur)return;stopPlayer();setScreen('cast');
- $('msgT').textContent='Casting to '+castName;$('msgP').textContent=`${cur.name} is on your TV. Swipe or use the guide to change channels; the play and volume buttons control the TV.`;
+ $('msgT').textContent='Casting to '+castName;$('msgP').textContent=`${cur.name} is on your TV. Change channels here; the play and volume buttons control the TV.`;
  $('msgB').innerHTML='<button class="pill" data-a="castsrc">Try another source</button><button class="pill red" data-a="caststop">Stop casting</button>'}
 async function castLoad(fresh){
  const sess=castCtx&&castCtx.getCurrentSession();if(!sess||!cur)return;
@@ -826,22 +848,44 @@ async function castLoad(fresh){
  sess.loadMedia(req).then(()=>{if(id!==castSeq)return;castScreen();toast(g.name+' is playing on '+castName)},()=>{if(id!==castSeq)return;
   const nx=(g.order||rankBase(g)).find(i=>!castTried.has(i));
   if(nx!=null){curSrc=nx;toast('Trying another source on the TV…');castLoad(false);return}
-  castScreen();$('msgP').textContent=`${castName} couldn’t play ${g.name}. Some channels only work on this device. Try another channel.`})}
+  castScreen();$('msgP').textContent=`${castName} couldn’t play ${g.name}. Some channels only work on this device. Try another channel, or mirror your screen from the Cast menu.`})}
 $('msgB').addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;
- if(a==='caststop'){if(castCtx)castCtx.endCurrentSession(true);else if(video.webkitShowPlaybackTargetPicker)video.webkitShowPlaybackTargetPicker()}
+ if(a==='caststop'){if(castCtx&&casting())castCtx.endCurrentSession(true);else if(video.webkitShowPlaybackTargetPicker)video.webkitShowPlaybackTargetPicker()}
  if(a==='castsrc'&&cur&&casting()){const o=cur.order||rankBase(cur);curSrc=o[(o.indexOf(curSrc)+1)%o.length];castLoad(false)}});
-// AirPlay on Apple devices: always offered, and the app shows when the picture is on the TV
-if(APPLE_WEB&&video.webkitShowPlaybackTargetPicker){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title='AirPlay';$('bCast').setAttribute('aria-label','AirPlay')}
+// AirPlay: the app shows when the picture is on the TV
 if(window.WebKitPlaybackTargetAvailabilityEvent){
- video.addEventListener('webkitplaybacktargetavailabilitychanged',e=>{if(!castCtx){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title=e.availability==='available'?'AirPlay':'AirPlay (no devices found yet)'}});
- video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged',()=>{const on=!!video.webkitCurrentPlaybackTargetIsWireless;$('bCast').classList.toggle('on',on);
-  if(on&&cur){$('screen').classList.add('cast');$('msgT').textContent='Playing on AirPlay';$('msgP').textContent=`${cur.name} is on your TV. Change channels here; to stop, tap AirPlay and choose this device.`;$('msgB').innerHTML='<button class="pill red" data-a="caststop">Choose device</button>'}
+ video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged',()=>{const on=!!video.webkitCurrentPlaybackTargetIsWireless;updCastBtn();
+  if(on&&cur){$('screen').classList.add('cast');$('msgT').textContent='Playing on AirPlay';$('msgP').textContent=`${cur.name} is on your TV. Change channels here; to stop, open Cast and choose AirPlay → this device.`;$('msgB').innerHTML='<button class="pill red" data-a="caststop">Choose device</button>'}
   else $('screen').classList.remove('cast')});
 }
-$('bCast').onclick=()=>{
- if(castCtx){castCtx.requestSession().catch(()=>{});return}
- if(video.webkitShowPlaybackTargetPicker){if(!cur){toast('Start a channel first, then AirPlay it');return}video.webkitShowPlaybackTargetPicker();return}
- toast('Casting works in Chrome or Edge (PC, Android) and AirPlay in Safari')};
+if(APPLE_WEB){$('bCast').innerHTML=ICON.airplay}
+function mirrorHint(){const u=navigator.userAgent;
+ if(IOS)return 'Open Control Center → Screen Mirroring, then pick your TV';
+ if(/Android/.test(u))return 'Swipe down Quick Settings → Cast / Smart View / Screen Cast, then pick your TV';
+ if(/Edg\//.test(u))return 'Edge menu (⋯) → More tools → Cast media to device';
+ if(/Chrome/.test(u))return 'Chrome menu (⋮) → Cast, save and share → Cast… → Sources: Cast tab';
+ if(/Mac/.test(u))return 'Control Center → Screen Mirroring, then pick your TV';
+ return 'Use your device’s screen mirroring or casting feature'}
+function renderCastMenu(){const C=window.cast&&cast.framework&&cast.framework.CastState,st=castStateName(),it=[];
+ if(castCtx){
+  if(st===C.CONNECTED)it.push(['gstop','Stop casting to '+castName,'Picture goes back to this device']);
+  else it.push(['gcast','Chromecast / Google TV',st===C.NO_DEVICES_AVAILABLE?'Looking for TVs on your Wi-Fi… tap to search':'Pick a TV on your Wi-Fi'])}
+ else if(CAST_CAPABLE)it.push(['gwait','Chromecast / Google TV','Getting ready… try again in a moment']);
+ if(video.webkitShowPlaybackTargetPicker)it.push(['air',video.webkitCurrentPlaybackTargetIsWireless?'AirPlay (playing on TV)':'AirPlay','Apple TV and AirPlay TVs (Samsung, LG, Sony, Vizio, Roku)']);
+ if(video.remote&&!hls&&!APPLE_WEB&&video.getAttribute('src'))it.push(['rpb','Other nearby devices','Uses your browser’s own device list']);
+ it.push(['mirror','Mirror your whole screen',mirrorHint()]);
+ it.push(['link','Copy stream link','Paste it into VLC or a TV app on any device']);
+ $('castList').innerHTML=it.map(([k,t,s])=>`<button class="opt two" data-cast="${k}"><span><b>${esc(t)}</b><small>${esc(s)}</small></span></button>`).join('')}
+$('bCast').onclick=e=>{e.stopPropagation();renderCastMenu();togglePop('castPop')};
+$('castPop').addEventListener('click',async e=>{e.stopPropagation();const k=e.target.closest('[data-cast]')?.dataset.cast;if(!k)return;
+ if(k==='gcast'){closePop();if(!cur){toast('Pick a channel first, then cast it');return}castCtx.requestSession().catch(err=>{if(err!=='cancel'&&err?.code!=='cancel')toast('No TV picked. Make sure the TV and this device are on the same Wi-Fi.')})}
+ if(k==='gstop'){closePop();castCtx.endCurrentSession(true)}
+ if(k==='gwait')toast('Cast is still loading. Try again in a few seconds.');
+ if(k==='air'){closePop();if(!cur){toast('Pick a channel first, then AirPlay it');return}video.webkitShowPlaybackTargetPicker()}
+ if(k==='rpb'){closePop();video.remote.prompt().catch(()=>toast('No other devices found'))}
+ if(k==='mirror')toast(mirrorHint());
+ if(k==='link'){closePop();copyUrl()}});
+updCastBtn();
 
 // ---------- install as an app (Android / Chrome / Edge) ----------
 let installEvt=null;
@@ -885,8 +929,8 @@ const CCS={size:{s:['S',.8],m:['M',1],l:['L',1.3],xl:['XL',1.65]},
  color:{white:['White','#ffffff'],yellow:['Yellow','#ffe14d'],cyan:['Cyan','#6fe7ff'],green:['Green','#7dff9a']},
  bg:{box:['Box','rgba(0,0,0,.75)'],soft:['See-through','rgba(0,0,0,.42)'],none:['Outline','transparent']},
  font:{sans:['Modern','"Space Grotesk",system-ui,sans-serif'],classic:['Classic','Helvetica,Arial,sans-serif'],serif:['Serif','Georgia,"Times New Roman",serif'],bold:['Bold','"Space Grotesk",system-ui,sans-serif']}};
-let ccStyle=Object.assign({size:'m',color:'white',bg:'box',font:'sans'},store.get('ccStyle',{}));
-for(const k in CCS)if(!CCS[k][ccStyle[k]])ccStyle[k]=Object.keys(CCS[k])[k==='size'?1:0];
+let ccStyle=Object.assign({size:'s',color:'white',bg:'soft',font:'classic'},store.get('ccStyle2',{}));
+const CC_DEF={size:'s',color:'white',bg:'soft',font:'classic'};for(const k in CCS)if(!CCS[k][ccStyle[k]])ccStyle[k]=CC_DEF[k];
 function applyCCStyle(){const sb=$('subs').style,st=ccStyle;
  sb.setProperty('--cc',CCS.color[st.color][1]);sb.setProperty('--cb',CCS.bg[st.bg][1]);sb.setProperty('--cf',CCS.font[st.font][1]);
  sb.setProperty('--cw',st.font==='bold'?700:500);
@@ -919,17 +963,17 @@ function renderQ(){
 }
 if(video.textTracks&&video.textTracks.addEventListener)['addtrack','removetrack','change'].forEach(ev=>video.textTracks.addEventListener(ev,()=>{
  if(ev==='addtrack'&&ccPref&&(!ccTrack||ccTrack.mode==='disabled')){const ts=ccTracks();if(ts.length){setCC(0,false);return}}renderCC()}));
-const popOpen=()=>$('ccPop').classList.contains('show')||$('qPop').classList.contains('show');
-function closePop(){$('ccPop').classList.remove('show');$('qPop').classList.remove('show');if(subsPreview){subsPreview=false;drawSubs();placeSubs()}}
+const popOpen=()=>!!document.querySelector('.pop.show');
+function closePop(){document.querySelectorAll('.pop.show').forEach(p=>p.classList.remove('show'));if(subsPreview){subsPreview=false;drawSubs();placeSubs()}}
 function togglePop(id){const open=!$(id).classList.contains('show');closePop();if(open)$(id).classList.add('show');wake()}
 $('bCC').onclick=e=>{e.stopPropagation();renderCC();renderCCStyle();togglePop('ccPop');subsPreview=$('ccPop').classList.contains('show');drawSubs();placeSubs()};
 $('ccStyle').addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-cs]');if(!b)return;const [k,v]=b.dataset.cs.split(':');
- ccStyle[k]=v;store.set('ccStyle',ccStyle);applyCCStyle();renderCCStyle();drawSubs()});
+ ccStyle[k]=v;store.set('ccStyle2',ccStyle);applyCCStyle();renderCCStyle();drawSubs()});
 $('bQ').onclick=e=>{e.stopPropagation();renderQ();togglePop('qPop')};
 $('ccPop').addEventListener('click',e=>{e.stopPropagation();const c=e.target.closest('[data-cc]');if(c){setCC(+c.dataset.cc);setTimeout(closePop,150)}});
 $('qPop').addEventListener('click',e=>{e.stopPropagation();const q=e.target.closest('[data-q]');
  if(q&&hls){hls.currentLevel=+q.dataset.q;$('quality').value=q.dataset.q;renderQ();toast('Quality: '+q.textContent);setTimeout(closePop,150)}});
-document.addEventListener('click',e=>{if(!e.target.closest('.pop,#bCC,#bQ'))closePop()});
+document.addEventListener('click',e=>{if(!e.target.closest('.pop,#bCC,#bQ,#bCast'))closePop()});
 renderCC();renderQ();applyCCStyle();
 addEventListener('resize',placeSubs);video.addEventListener('loadedmetadata',placeSubs);video.addEventListener('resize',placeSubs);
 new MutationObserver(placeSubs).observe(document.querySelector('.stage'),{attributes:true,attributeFilter:['class']});
