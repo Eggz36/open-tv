@@ -33,10 +33,10 @@ body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Space Grotes
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
-.app{position:relative;height:100vh;height:100dvh;background:#000;overflow:hidden}
+.app{position:relative;height:100vh;height:100dvh;background:#000;overflow:hidden;overflow:clip}
 .stage:fullscreen{height:100vh;height:100dvh}
 /* the video always fills the screen; controls, details and guide float over it as frosted glass */
-.app.ov .stage{position:absolute;inset:0;overflow:hidden;background:#000}
+.app.ov .stage{position:absolute;inset:0;overflow:hidden;overflow:clip;background:#000}
 .app.ov .screen{flex:1;aspect-ratio:auto;max-height:none}
 .glass{background:rgba(44,44,50,.34);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.14)}
 .app.ov .bar{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:calc(100% - 20px);z-index:4;border-radius:28px;padding:6px;gap:2px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;transition:opacity .35s,transform .35s;
