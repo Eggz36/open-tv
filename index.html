@@ -900,7 +900,9 @@ function drawSubs(){const lines=[];
 function placeSubs(){const sc=$('screen'),W=sc.clientWidth,H=sc.clientHeight;if(!W||!H)return;
  const vw=video.videoWidth||16,vh=video.videoHeight||9,ch=Math.min(H,W*vh/vw),cw=Math.min(W,H*vw/vh);
  const ctrl=document.querySelector('.stage').classList.contains('idleui')?0:(PHONE()?82:92);
- const sb=$('subs').style;sb.bottom=Math.max((H-ch)/2+ch*.07,ctrl+8)+'px';sb.left=sb.right=Math.max((W-cw)/2+cw*.06,12)+'px';
+ let bot=Math.max((H-ch)/2+ch*.07,ctrl+8);
+ if(subsPreview&&$('ccPop').classList.contains('show')){const pr=$('ccPop').getBoundingClientRect(),sr=sc.getBoundingClientRect();bot=Math.min(Math.max(bot,sr.bottom-pr.top+14),H-60)}
+ const sb=$('subs').style;sb.bottom=bot+'px';sb.left=sb.right=Math.max((W-cw)/2+cw*.06,12)+'px';
  sb.fontSize=Math.max(13,Math.min(40,cw*.042))*CCS.size[ccStyle.size][1]+'px'}
 function renderCCStyle(){const row=(k,label)=>`<div class="lbl">${label}</div><div class="seg">`+Object.entries(CCS[k]).map(([v,[name,val]])=>
   `<button class="${ccStyle[k]===v?'sel':''}" data-cs="${k}:${v}">${k==='color'?`<i style="background:${val}"></i>`:''}${esc(name)}</button>`).join('')+'</div>';
@@ -918,9 +920,9 @@ function renderQ(){
 if(video.textTracks&&video.textTracks.addEventListener)['addtrack','removetrack','change'].forEach(ev=>video.textTracks.addEventListener(ev,()=>{
  if(ev==='addtrack'&&ccPref&&(!ccTrack||ccTrack.mode==='disabled')){const ts=ccTracks();if(ts.length){setCC(0,false);return}}renderCC()}));
 const popOpen=()=>$('ccPop').classList.contains('show')||$('qPop').classList.contains('show');
-function closePop(){$('ccPop').classList.remove('show');$('qPop').classList.remove('show');if(subsPreview){subsPreview=false;drawSubs()}}
+function closePop(){$('ccPop').classList.remove('show');$('qPop').classList.remove('show');if(subsPreview){subsPreview=false;drawSubs();placeSubs()}}
 function togglePop(id){const open=!$(id).classList.contains('show');closePop();if(open)$(id).classList.add('show');wake()}
-$('bCC').onclick=e=>{e.stopPropagation();renderCC();renderCCStyle();togglePop('ccPop');subsPreview=$('ccPop').classList.contains('show');drawSubs()};
+$('bCC').onclick=e=>{e.stopPropagation();renderCC();renderCCStyle();togglePop('ccPop');subsPreview=$('ccPop').classList.contains('show');drawSubs();placeSubs()};
 $('ccStyle').addEventListener('click',e=>{e.stopPropagation();const b=e.target.closest('[data-cs]');if(!b)return;const [k,v]=b.dataset.cs.split(':');
  ccStyle[k]=v;store.set('ccStyle',ccStyle);applyCCStyle();renderCCStyle();drawSubs()});
 $('bQ').onclick=e=>{e.stopPropagation();renderQ();togglePop('qPop')};
