@@ -21,10 +21,10 @@ Open TV is a free live TV app for iPhone, Android and PC. It runs from GitHub Pa
 | Type a channel number | – | 0–9, then Enter |
 | Try another stream source | – | → |
 
-The buttons on the control bar are play/pause, sound, favorite, cast, picture-in-picture, fullscreen, guide, dock details, show details and help.
+The video always fills the screen. The controls float over it as a frosted bar with play/pause, sound, favorite, cast, picture-in-picture, fullscreen, guide, details (⌃) and help.
 
-- **Guide button:** hides the channel list. On a phone, the video then fills the screen.
-- **Dock details button:** when details are tucked away, the controls float over the video as a frosted bar, and the details slide up over the picture.
+- **Guide button:** slides the channel list in or out as a frosted panel over the video. On a phone, it closes by itself after you pick a channel.
+- **⌃ button:** slides the channel details up over the picture.
 
 ## Casting to a TV
 
