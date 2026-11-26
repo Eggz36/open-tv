@@ -9,12 +9,15 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Open TV">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/png" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>Open TV</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
+<script>
+if(/Chrome|Edg\//.test(navigator.userAgent)&&!/CriOS|EdgiOS|iPhone|iPad/.test(navigator.userAgent)&&location.protocol==='https:'){const c=document.createElement('script');c.src='https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';c.async=true;document.head.appendChild(c)}
+</script>
 <style>
 /*
 VOICE: late-night living room, a cable box that just works
@@ -33,16 +36,38 @@ button{cursor:pointer}
 .app{display:grid;grid-template-columns:380px minmax(0,1fr);grid-template-rows:minmax(0,1fr);height:100vh;height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left);background:var(--bg)}
 .app.noguide{grid-template-columns:minmax(0,1fr)}
 .app.noguide .guide{display:none}
-.app.noinfo .info,.stage:fullscreen .info{display:none}
-.app.noinfo .stage{overflow:hidden;position:relative;background:#000}
-.stage:fullscreen{height:100vh;height:100dvh;overflow:hidden;position:relative;background:#000}
-.app.noinfo .screen,.stage:fullscreen .screen{flex:1;aspect-ratio:auto;max-height:none}
-.app.noinfo .bar,.stage:fullscreen .bar{position:absolute;left:0;right:0;bottom:0;z-index:3;background:linear-gradient(transparent,rgba(0,0,0,.55));border:0;padding:34px 14px calc(12px + env(safe-area-inset-bottom));transition:opacity .35s}
-.app.noinfo .bar .cbtn,.app.noinfo .bar select,.stage:fullscreen .bar .cbtn,.stage:fullscreen .bar select{background:rgba(18,18,22,.3);border-color:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);text-shadow:0 1px 2px #000}
-.app.noinfo .bar select option{background:var(--panel)}
-.app.noinfo .stage.idleui .bar,.stage:fullscreen.idleui .bar{opacity:0}
-.app.noinfo .stage.idleui,.stage:fullscreen.idleui{cursor:none}
-.app.noinfo .banner,.stage:fullscreen .banner{padding-bottom:84px}
+.app.noinfo:not(.ov) .info{display:none}
+.stage:fullscreen{height:100vh;height:100dvh}
+/* overlay ("theater") mode: video fills, controls float as frosted glass */
+.app.ov .stage{overflow:hidden;position:relative;background:#000}
+.app.ov .screen{flex:1;aspect-ratio:auto;max-height:none}
+.glass{background:rgba(44,44,50,.34);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.14)}
+.app.ov .bar{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:calc(100% - 20px);z-index:4;border-radius:28px;padding:6px;gap:2px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;transition:opacity .35s,transform .35s;
+ background:rgba(44,44,50,.34);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.14)}
+.app.ov .bar::-webkit-scrollbar{display:none}
+.app.ov .bar .cbtn{background:transparent;color:#fff;border-radius:22px}
+.app.ov .bar .cbtn:hover{background:rgba(255,255,255,.14)}
+.app.ov .bar .cbtn.on{background:rgba(255,255,255,.2)}
+.app.ov .bar select{background:rgba(255,255,255,.12);border:0;border-radius:18px;height:36px;color:#fff}
+.app.ov .bar select option{background:var(--panel)}
+.app.ov .bar .sp{display:none}
+.app.ov .stage.idleui:not(.sheet) .bar{opacity:0;transform:translate(-50%,24px);pointer-events:none}
+.app.ov .stage.idleui:not(.sheet){cursor:none}
+.app.ov .banner{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+#bSheet{display:none}.app.ov #bSheet{display:inline-flex}
+.app.ov .stage.sheet #bSheet svg{transform:rotate(180deg)}
+/* details as a frosted sheet that slides up over the video */
+.app.ov .info{position:absolute;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));width:min(820px,calc(100% - 20px));max-height:min(62%,560px);overflow:auto;z-index:4;border-radius:24px;padding:22px;color:#fff;
+ background:rgba(30,30,36,.5);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
+ transform:translate(-50%,calc(100% + 120px));opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .3s}
+.app.ov .stage.sheet .info{transform:translate(-50%,0);opacity:1;pointer-events:auto}
+.app.ov .info::before{content:"";position:absolute;top:8px;left:50%;width:38px;height:5px;margin-left:-19px;border-radius:3px;background:rgba(255,255,255,.35)}
+.app.ov .info .meta,.app.ov .info dt,.app.ov .info h3,.app.ov .src .st{color:rgba(255,255,255,.66)}
+.app.ov .src{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.12)}
+.app.ov .stage.sheet .banner{opacity:0}
+.cbtn svg{width:22px;height:22px;flex:none;transition:transform .3s}
+.screen.cast .msg{display:grid}
+.screen.cast video{opacity:0}
 /* guide */
 .guide{display:flex;flex-direction:column;background:var(--panel);border-right:1px solid var(--line);min-height:0;padding-bottom:env(safe-area-inset-bottom)}
 .brand{display:flex;align-items:center;gap:10px;padding:14px 16px 8px}
@@ -106,10 +131,12 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .toast{position:absolute;left:50%;top:18px;transform:translateX(-50%);background:rgba(0,0,0,.8);padding:7px 14px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
 /* control bar */
-.bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
-.cbtn{height:44px;min-width:44px;padding:0 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel2);display:inline-flex;align-items:center;gap:7px;justify-content:center;font-weight:500}
-.cbtn:hover{border-color:#44444f}
-.cbtn.on{color:var(--warn)}
+.bar{display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.cbtn{height:44px;min-width:44px;padding:0 11px;border-radius:14px;border:0;background:rgba(255,255,255,.07);display:inline-flex;align-items:center;gap:7px;justify-content:center;font-weight:500;color:var(--ink)}
+.cbtn:hover{background:rgba(255,255,255,.13)}
+.cbtn.on{background:rgba(255,255,255,.18)}
+#bFav.on{color:var(--warn)}
+.cbtn[hidden]{display:none}
 .cbtn.chan{font:24px/1 VT323,monospace;min-width:auto}
 .vol{display:flex;align-items:center;gap:6px}
 input[type=range]{accent-color:var(--acc);width:100px}
@@ -151,16 +178,15 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  .bar::-webkit-scrollbar{display:none}
  .bar .sp{display:none}
  .cbtn{flex:none;padding:0 10px}
- .app.noinfo .stage{background:none;position:static;overflow:visible}
- .app.noinfo .bar{position:static;background:var(--panel);padding:8px 10px;opacity:1!important}
- .app.noguide .stage{flex:1;min-height:0}
+ .app.ov .stage,.app.noguide .stage{flex:1;min-height:0}
  .app.noguide .screen{flex:1;aspect-ratio:auto}
- .app.noguide .bar{padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+ .app.ov .info{padding:20px 16px}
  .brand{padding-top:10px}
  .banner{padding:30px 14px 10px}.banner .logo{width:62px;height:42px}
  .osd{top:10px;right:14px}
 }
 .touch .vol input{display:none}
+.install{display:none}.can-install .install{display:inline-flex}
 .touch .row:hover{background:transparent}
 .hint{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);font-size:12.5px;color:#ddd;background:rgba(0,0,0,.6);padding:5px 12px;border-radius:12px;pointer-events:none;white-space:nowrap}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
@@ -175,7 +201,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 
 <div class="app" id="app">
  <aside class="guide" aria-label="Channel guide">
-  <div class="brand"><b>Open TV</b><span class="live">LIVE</span><span class="count" id="count"></span></div>
+  <div class="brand"><b>Open TV</b><span class="live">LIVE</span><span class="count" id="count"></span><button class="pill red install" id="bInstall2" style="height:32px;padding:0 12px;font-size:13px">Install</button></div>
   <div class="search">
    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg>
    <input id="q" type="search" placeholder="Search channels, networks…" autocomplete="off">
@@ -199,7 +225,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 
  <main class="stage">
   <div class="screen idle" id="screen">
-   <video id="video" playsinline></video>
+   <video id="video" playsinline x-webkit-airplay="allow"></video>
    <canvas id="noise" width="160" height="90"></canvas>
    <div class="msg" id="msg"><h2 id="msgT">NO SIGNAL</h2><p id="msgP">Pick a channel from the guide, or type a channel number.</p><div class="btns" id="msgB"></div></div>
    <div class="osd" id="osd"></div>
@@ -208,19 +234,18 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
    <div class="banner" id="banner"></div>
   </div>
   <div class="bar">
-   <button class="cbtn chan" id="bPrev" title="Previous channel (↑)" aria-label="Previous channel">CH ▲</button>
-   <button class="cbtn chan" id="bNext" title="Next channel (↓)" aria-label="Next channel">CH ▼</button>
-   <button class="cbtn" id="bRecall" title="Last channel (Backspace)">⟲ Last</button>
-   <button class="cbtn" id="bPlay" title="Play / pause (Space)" aria-label="Play or pause">❚❚</button>
-   <div class="vol"><button class="cbtn" id="bMute" title="Mute (M)" aria-label="Mute">🔊</button><input type="range" id="vol" min="0" max="1" step="0.05" aria-label="Volume"></div>
+   <button class="cbtn" id="bPlay" title="Play / pause (Space)" aria-label="Play or pause"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="4" width="4.5" height="16" rx="1.4"/><rect x="14" y="4" width="4.5" height="16" rx="1.4"/></svg></button>
+   <div class="vol"><button class="cbtn" id="bMute" title="Mute (M)" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg></button><input type="range" id="vol" min="0" max="1" step="0.05" aria-label="Volume"></div>
    <div class="sp"></div>
    <select id="quality" aria-label="Quality" title="Quality"><option value="-1">Auto</option></select>
-   <button class="cbtn" id="bFav" title="Favorite (S)">☆ Fav</button>
-   <button class="cbtn on" id="bGuide" title="Show / hide channel guide (G)">☰ Guide</button>
-   <button class="cbtn on" id="bInfo" title="Show / hide channel details (B)">▤ Details</button>
-   <button class="cbtn" id="bPip" title="Picture in picture">⧉</button>
-   <button class="cbtn" id="bFull" title="Fullscreen (F)">⛶</button>
-   <button class="cbtn" id="bHelp" title="Shortcuts (?)">?</button>
+   <button class="cbtn" id="bFav" title="Favorite (S)" aria-label="Favorite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3.5 2.6 5.3 5.9.86-4.25 4.14 1 5.86L12 16.9l-5.25 2.76 1-5.86L3.5 9.66l5.9-.86z"/></svg></button>
+   <button class="cbtn" id="bCast" title="Cast to TV" aria-label="Cast to TV" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8V6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5H14"/><path d="M3 12a8 8 0 0 1 8 8M3 16a4 4 0 0 1 4 4"/><circle cx="3.5" cy="19.5" r="1" fill="currentColor"/></svg></button>
+   <button class="cbtn" id="bPip" title="Picture in picture" aria-label="Picture in picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><rect x="12" y="11.5" width="6.5" height="5" rx="1" fill="currentColor"/></svg></button>
+   <button class="cbtn" id="bFull" title="Fullscreen (F)" aria-label="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+   <button class="cbtn on" id="bGuide" title="Show / hide channel guide (G)" aria-label="Channel guide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M9.5 4.5v15M5.5 8.5h1.5M5.5 11.5h1.5M5.5 14.5h1.5" stroke-linecap="round"/></svg></button>
+   <button class="cbtn on" id="bInfo" title="Dock / undock channel details (B)" aria-label="Channel details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="4.5" width="18" height="15" rx="2.5"/><path d="M3 13.5h18"/><path d="M6.5 16.5h7" stroke-linecap="round"/></svg></button>
+   <button class="cbtn" id="bSheet" title="Show details (scroll up)" aria-label="Show details"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 14.5 6-6 6 6"/></svg></button>
+   <button class="cbtn" id="bHelp" title="Shortcuts (?)" aria-label="Help"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.6"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg></button>
   </div>
   <section class="info" id="info"></section>
  </main>
@@ -234,6 +259,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  <label class="chk"><input type="checkbox" id="oNsfw"> Show adult (NSFW) channels</label>
  <label class="chk"><input type="checkbox" id="oHttp"> Hide plain-http streams (fewer failures in some browsers)</label>
  <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
+  <button class="pill red install" id="bInstall">Install app</button>
   <button class="pill" id="bM3u">Download filtered list as .m3u</button>
   <button class="pill" id="bReload">Refresh database</button>
   <button class="pill red" data-close>Done</button>
@@ -252,6 +278,8 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
   <kbd>M</kbd><span>Mute</span><kbd>+ / −</kbd><span>Volume</span>
   <kbd>S</kbd><span>Favorite this channel</span>
   <kbd>R</kbd><span>Random channel</span>
+  <kbd>Scroll ↑ / swipe up on controls</kbd><span>Slide up the channel details</span>
+  <kbd>Swipe ↑ / ↓ on video</kbd><span>Next / previous channel</span>
   <kbd>F</kbd><span>Fullscreen</span><kbd>G</kbd><span>Show / hide guide</span><kbd>B</kbd><span>Show / hide details below the video</span>
   <kbd>I</kbd><span>Show channel banner</span><kbd>/</kbd><span>Search</span>
  </div>
@@ -274,6 +302,7 @@ const TOUCH=matchMedia('(pointer: coarse)').matches;if(TOUCH)document.documentEl
 const F=Object.assign({q:'',country:'',lang:'',cat:'',tab:'all'},store.get('filters',{}));F.q='';
 let cur=null,curSrc=0,last=null,dir=1,hls=null,tuneId=0,tuneTimer=null,srcState=new Map();
 const RH=62;
+const ICON={"play": "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M7 4.5v15a1 1 0 0 0 1.5.86l12.5-7.5a1 1 0 0 0 0-1.72L8.5 3.64A1 1 0 0 0 7 4.5z\"/></svg>", "pause": "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><rect x=\"5.5\" y=\"4\" width=\"4.5\" height=\"16\" rx=\"1.4\"/><rect x=\"14\" y=\"4\" width=\"4.5\" height=\"16\" rx=\"1.4\"/></svg>", "vol": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\" fill=\"currentColor\"/><path d=\"M15.5 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11\"/></svg>", "mute": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 9.5h3.5L12 5.5v13l-4.5-4H4z\" fill=\"currentColor\"/><path d=\"m16 9.5 5 5M21 9.5l-5 5\"/></svg>", "star": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\"><path d=\"m12 3.5 2.6 5.3 5.9.86-4.25 4.14 1 5.86L12 16.9l-5.25 2.76 1-5.86L3.5 9.66l5.9-.86z\"/></svg>", "starf": "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\"><path d=\"m12 3.5 2.6 5.3 5.9.86-4.25 4.14 1 5.86L12 16.9l-5.25 2.76 1-5.86L3.5 9.66l5.9-.86z\"/></svg>", "airplay": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linejoin=\"round\"><path d=\"M6.5 17H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-1.5\"/><path d=\"m12 14.5 5 6H7z\" fill=\"currentColor\"/></svg>"};
 
 // ---------- load ----------
 const files=['streams','channels','logos','countries','categories','languages','feeds','blocklist'];
@@ -386,7 +415,7 @@ function noise(){
  if(!reduce&&(sc.contains('tuning')||sc.contains('nosig')||sc.contains('idle')))requestAnimationFrame(noise);else noiseOn=false;
 }
 let noiseOn=false;
-function setScreen(state){const s=$('screen');s.classList.remove('tuning','nosig','idle');if(state)s.classList.add(state);if(state&&!noiseOn){noiseOn=true;noise()}}
+function setScreen(state){const s=$('screen');s.classList.remove('tuning','nosig','idle','cast');if(state==='cast'){s.classList.add('cast');return}if(state)s.classList.add(state);if(state&&!noiseOn){noiseOn=true;noise()}}
 
 // ---------- OSD / banner ----------
 let osdT,banT,toastT;
@@ -445,7 +474,9 @@ async function tune(g,si=null,opts={}){
  g.order=order;curSrc=order[0];playSource();
 }
 function playSource(){
- pickSeq++;const id=++tuneId,g=cur,s=g.sources[curSrc];
+ pickSeq++;mediaMeta();
+ if(casting()){tuneId++;banner();renderSources();castLoad();return}
+ const id=++tuneId,g=cur,s=g.sources[curSrc];
  stopPlayer();setScreen('tuning');banner();renderSources();
  $('quality').innerHTML='<option value="-1">Auto</option>';
  const isHls=/m3u8/i.test(s.url)||!/\.(mp4|webm|ogg|mp3|aac)(\?|$)/i.test(s.url);
@@ -466,8 +497,8 @@ function startPlay(id){
  video.play().catch(err=>{if(id!==tuneId)return;
   if(err.name==='NotAllowedError'){video.muted=true;updateMute();video.play().catch(()=>{});toast('Muted to autoplay — press M for sound')}});
 }
-video.addEventListener('playing',()=>{clearTimeout(tuneTimer);if(!cur)return;srcState.set(cur.sources[curSrc].url,'ok');saveHealth(cur.sources[curSrc].url,1);setScreen(null);renderSources();banner();$('bPlay').textContent='❚❚'});
-video.addEventListener('pause',()=>$('bPlay').textContent='▶');
+video.addEventListener('playing',()=>{clearTimeout(tuneTimer);if(!cur)return;srcState.set(cur.sources[curSrc].url,'ok');saveHealth(cur.sources[curSrc].url,1);setScreen(null);renderSources();banner();$('bPlay').innerHTML=ICON.pause;mediaState('playing')});
+video.addEventListener('pause',()=>{$('bPlay').innerHTML=ICON.play;mediaState('paused')});
 video.addEventListener('error',()=>{if(!hls&&cur&&video.getAttribute('src'))fail(tuneId,'stream unavailable')});
 video.addEventListener('waiting',()=>{});
 function fail(id,why){
@@ -519,9 +550,9 @@ function renderSources(){
   return `<button class="src${i===curSrc?' cur':''}" data-src="${i}"><div><div class="nm"><span class="dot ${st==='ok'?'ok':st==='bad'?'bad':''}"></span>${esc(s.feed||s.title)}</div><div class="st">${esc([rank===0?'★ best pick':'',s.realH?s.realH+'p (measured)':s.q,s.ms?s.ms+' ms':'',s.url.startsWith('http:')?'http':'https',...s.labels,s.hdr?'needs headers':''].filter(Boolean).join(' · '))}</div></div><span class="st">${i===curSrc?(st==='ok'?'Playing':'Tuning…'):'Play'}</span></button>`}).join('')+
   `<button class="pill" data-a="copy" style="justify-self:start;margin-top:4px">Copy stream URL</button>`;
 }
-function updateFav(){const on=cur&&favs.has(cur.id);$('bFav').textContent=on?'★ Fav':'☆ Fav';$('bFav').classList.toggle('on',!!on)}
+function updateFav(){const on=cur&&favs.has(cur.id);$('bFav').innerHTML=on?ICON.starf:ICON.star;$('bFav').classList.toggle('on',!!on)}
 function toggleFav(){if(!cur)return;favs.has(cur.id)?favs.delete(cur.id):favs.add(cur.id);store.set('favs',[...favs]);updateFav();toast(favs.has(cur.id)?'Added to favorites':'Removed from favorites');if(F.tab==='fav')applyFilters(true);else renderList()}
-function updateMute(){$('bMute').textContent=video.muted||video.volume===0?'🔇':'🔊';$('vol').value=video.muted?0:video.volume;store.set('muted',video.muted);store.set('vol',video.volume)}
+function updateMute(){$('bMute').innerHTML=video.muted||video.volume===0?ICON.mute:ICON.vol;$('vol').value=video.muted?0:video.volume;store.set('muted',video.muted);store.set('vol',video.volume)}
 async function copyUrl(){if(!cur)return;const u=cur.sources[curSrc].url;try{await navigator.clipboard.writeText(u);toast('Stream URL copied — paste into VLC › Open Network Stream')}catch{prompt('Stream URL',u)}}
 
 // ---------- events ----------
@@ -535,33 +566,65 @@ let rafL=0;$('list').addEventListener('scroll',()=>{if(!rafL)rafL=requestAnimati
 $('list').addEventListener('click',e=>{const r=e.target.closest('.row');if(r){surfing=false;tune(VIEW[+r.dataset.i])}});
 $('info').addEventListener('click',e=>{const s=e.target.closest('[data-src]');if(s){curSrc=+s.dataset.src;tried=new Set();playSource()}if(e.target.closest('[data-a=copy]'))copyUrl()});
 $('msgB').addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='retry'){surfing=false;tune(cur,null,{retry:1})}if(a==='copy')copyUrl();if(a==='next'){step(1)}});
-$('bPrev').onclick=()=>step(-1);$('bNext').onclick=()=>step(1);
-$('bRecall').onclick=()=>{if(last){surfing=false;const l=last;last=cur;tune(l,null,{keepLast:1})}else toast('No previous channel')};
+function recall(){if(last){surfing=false;const l=last;last=cur;tune(l,null,{keepLast:1})}else toast('No previous channel')}
 $('bPlay').onclick=()=>video.paused?video.play().catch(()=>{}):video.pause();
 $('bMute').onclick=()=>{video.muted=!video.muted;if(!video.muted&&video.volume===0)video.volume=.5;updateMute()};
 $('vol').oninput=e=>{video.volume=+e.target.value;video.muted=video.volume===0;updateMute()};
 $('quality').onchange=e=>{if(hls){hls.currentLevel=+e.target.value;toast('Quality: '+e.target.selectedOptions[0].textContent)}};
 $('bFav').onclick=toggleFav;
-function setPanel(cls,btn,hide,msg){$('app').classList.toggle(cls,hide);$(btn).classList.toggle('on',!hide);store.set(cls,hide);if(msg)toast(msg);wake()}
+function setPanel(cls,btn,hide,msg){$('app').classList.toggle(cls,hide);$(btn).classList.toggle('on',!hide);store.set(cls,hide);if(msg)toast(msg);updOv();wake()}
 $('bGuide').onclick=()=>{const hid=!$('app').classList.contains('noguide');setPanel('noguide','bGuide',hid,hid?'Guide hidden — ☰ or G brings it back':'Guide shown');
  setTimeout(()=>{renderList();if(!hid){if(innerWidth<=900)document.querySelector('.guide').scrollIntoView({behavior:'smooth'});scrollToCur()}},50)};
-$('bInfo').onclick=()=>{const hid=!$('app').classList.contains('noinfo');setPanel('noinfo','bInfo',hid,hid?'Details hidden — ▤ or B brings them back':'Details shown')};
+$('bInfo').onclick=()=>{const hid=!$('app').classList.contains('noinfo');setPanel('noinfo','bInfo',hid,hid?'Details tucked away — scroll up or tap ⌃ to peek':'Details docked below the video')};
+function updOv(){const a=$('app'),ov=!!document.fullscreenElement||(a.classList.contains('noinfo')&&(innerWidth>900||a.classList.contains('noguide')));
+ a.classList.toggle('ov',ov);if(!ov&&typeof stage!=='undefined')closeSheet(true)}
+addEventListener('resize',updOv);document.addEventListener('fullscreenchange',()=>{updOv();if(!document.fullscreenElement)try{screen.orientation.unlock()}catch{}});
 // auto-hide the overlay controls when the mouse is idle
 const stage=document.querySelector('.stage');let idleT;
 function wake(e){stage.classList.remove('idleui');clearTimeout(idleT);
- if(e&&e.target.closest&&e.target.closest('.bar'))return;
+ if(e&&e.target.closest&&e.target.closest('.bar,.info'))return;
+ if(stage.classList.contains('sheet'))return;
  idleT=setTimeout(()=>{if(!video.paused&&($('app').classList.contains('noinfo')||document.fullscreenElement))stage.classList.add('idleui')},2800)}
 ['mousemove','touchstart','keydown'].forEach(ev=>stage.addEventListener(ev,wake,{passive:true}));document.addEventListener('keydown',wake);
 video.addEventListener('pause',()=>stage.classList.remove('idleui'));
 
-$('bFull').onclick=()=>{const p=document.fullscreenElement?document.exitFullscreen():(stage.requestFullscreen&&!/iPhone|iPod/.test(navigator.userAgent)?stage.requestFullscreen():video.webkitEnterFullscreen?.());p?.catch?.(()=>toast('Fullscreen not available'))};
+$('bFull').onclick=()=>{
+ if(document.fullscreenElement){document.exitFullscreen().catch(()=>{});return}
+ if(stage.requestFullscreen&&!/iPhone|iPod/.test(navigator.userAgent)){
+  stage.requestFullscreen({navigationUI:'hide'}).then(()=>{if(TOUCH)screen.orientation?.lock?.('landscape').catch(()=>{})}).catch(()=>toast('Fullscreen not available'))}
+ else if(video.webkitEnterFullscreen&&video.getAttribute('src'))video.webkitEnterFullscreen();else toast('Start a channel first')};
 $('screen').addEventListener('dblclick',()=>$('bFull').click());
 $('screen').addEventListener('mousemove',()=>{if(cur&&!$('banner').classList.contains('show'))banner()});
 $('bPip').onclick=async()=>{try{document.pictureInPictureElement?await document.exitPictureInPicture():await video.requestPictureInPicture()}catch{toast('Picture-in-picture not available')}};
 $('btnShuffle').onclick=random;
-const openM=id=>$(id).classList.add('show');
+// layers (modals + details sheet) close with the Android back button
+function pushLayer(){try{history.pushState({otvLayer:1},'')}catch{}}
+function closeLayers(){document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'));stage.classList.remove('sheet');wake()}
+function popLayer(){if(history.state&&history.state.otvLayer)history.back();else closeLayers()}
+addEventListener('popstate',closeLayers);
+const openM=id=>{$(id).classList.add('show');pushLayer()};
 $('btnSettings').onclick=()=>openM('mSettings');$('bHelp').onclick=()=>openM('mHelp');
-document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]'))m.classList.remove('show')}));
+document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m||e.target.closest('[data-close]'))popLayer()}));
+function openSheet(){if(!$('app').classList.contains('ov')||stage.classList.contains('sheet'))return;if(!cur){toast('Pick a channel first');return}stage.classList.add('sheet');stage.classList.remove('idleui');clearTimeout(idleT);pushLayer()}
+function closeSheet(silent){if(!stage.classList.contains('sheet'))return;if(silent){stage.classList.remove('sheet');return}popLayer()}
+$('bSheet').onclick=()=>stage.classList.contains('sheet')?closeSheet():openSheet();
+// scroll up over the video (while the controls are showing) slides the details up; scroll down puts them away
+let wheelLock=0;
+stage.addEventListener('wheel',e=>{
+ if(!$('app').classList.contains('ov')||e.target.closest('.info')||e.target.closest('.guide'))return;
+ const now=Date.now();if(now<wheelLock||Math.abs(e.deltaY)<8)return;
+ const open=stage.classList.contains('sheet');
+ if(e.deltaY<0&&!open&&!stage.classList.contains('idleui')){openSheet();wheelLock=now+500;e.preventDefault()}
+ else if(e.deltaY>0&&open){closeSheet();wheelLock=now+500;e.preventDefault()}
+ else if(e.deltaY<0&&stage.classList.contains('idleui')){wake();wheelLock=now+300}
+},{passive:false});
+// swipe up on the controls bar opens the sheet; swipe down on the sheet closes it
+let bs=null;
+$('app').querySelector('.bar').addEventListener('touchstart',e=>{bs=e.touches[0].clientY},{passive:true});
+$('app').querySelector('.bar').addEventListener('touchend',e=>{if(bs==null)return;const dy=e.changedTouches[0].clientY-bs;bs=null;if(dy<-28)openSheet();else if(dy>28)closeSheet()},{passive:true});
+let ss=null;
+$('info').addEventListener('touchstart',e=>{ss=$('info').scrollTop<=0?e.touches[0].clientY:null},{passive:true});
+$('info').addEventListener('touchend',e=>{if(ss==null)return;const dy=e.changedTouches[0].clientY-ss;ss=null;if(dy>60)closeSheet()},{passive:true});
 const optMap={oSkip:'skip',oGeo:'geo',oNot247:'not247',oNsfw:'nsfw',oHttp:'http'};
 for(const [el,k] of Object.entries(optMap)){$(el).checked=opt[k];$(el).onchange=e=>{opt[k]=e.target.checked;store.set('opt',opt);applyFilters(true)}}
 $('bM3u').onclick=()=>{
@@ -578,32 +641,96 @@ document.addEventListener('keydown',e=>{
  const k=e.key;
  if(/^[0-9]$/.test(k)){digit(k);return}
  const map={ArrowUp:()=>step(-1),ArrowDown:()=>step(1),PageUp:()=>step(-10),PageDown:()=>step(10),ArrowRight:()=>{if(cur){const o=cur.order||rankBase(cur);curSrc=o[(o.indexOf(curSrc)+1)%o.length];playSource()}},
-  Enter:commitDigits,Backspace:()=>{if(digits){digits=digits.slice(0,-1);$('entry').textContent=digits+'-';if(!digits)$('entry').classList.remove('show')}else $('bRecall').click()},
+  Enter:commitDigits,Backspace:()=>{if(digits){digits=digits.slice(0,-1);$('entry').textContent=digits+'-';if(!digits)$('entry').classList.remove('show')}else recall()},
   ' ':()=>$('bPlay').click(),m:()=>$('bMute').click(),s:toggleFav,r:random,f:()=>$('bFull').click(),g:()=>$('bGuide').click(),i:banner,b:()=>$('bInfo').click(),
   '/':()=>$('q').focus(),'?':()=>openM('mHelp'),'+':()=>{video.volume=Math.min(1,video.volume+.1);video.muted=false;updateMute();toast('Volume '+Math.round(video.volume*100))},
   '=':()=>map['+'](),'-':()=>{video.volume=Math.max(0,video.volume-.1);updateMute();toast('Volume '+Math.round(video.volume*100))},
-  Escape:()=>document.querySelectorAll('.modal.show').forEach(m=>m.classList.remove('show'))};
+  Escape:()=>{if(document.querySelector('.modal.show')||stage.classList.contains('sheet'))popLayer()},
+  ChannelUp:()=>step(-1),ChannelDown:()=>step(1),MediaTrackNext:()=>step(1),MediaTrackPrevious:()=>step(-1),
+  MediaPlayPause:()=>$('bPlay').click(),MediaPlay:()=>video.play().catch(()=>{}),MediaPause:()=>video.pause(),AudioVolumeMute:()=>$('bMute').click()};
  const fn=map[k]||map[k.toLowerCase()];
  if(fn){e.preventDefault();fn()}
 });
 new ResizeObserver(()=>renderList()).observe($('list'));
+
+// ---------- lock screen / notification controls (Android + iOS) ----------
+function mediaState(st){try{navigator.mediaSession.playbackState=st}catch{}}
+function mediaMeta(){
+ if(!('mediaSession' in navigator)||!cur)return;
+ try{navigator.mediaSession.metadata=new MediaMetadata({title:cur.name,artist:sub(cur)||'Live TV',album:'Open TV · Channel '+cur.n,
+  artwork:cur.logo?[{src:cur.logo,sizes:'512x512'},{src:'icon-512.png',sizes:'512x512',type:'image/png'}]:[{src:'icon-512.png',sizes:'512x512',type:'image/png'}]})}catch{}
+}
+if('mediaSession' in navigator){const ms=navigator.mediaSession,h=(a,f)=>{try{ms.setActionHandler(a,f)}catch{}};
+ h('play',()=>video.play().catch(()=>{}));h('pause',()=>video.pause());h('nexttrack',()=>step(1));h('previoustrack',()=>step(-1));h('stop',()=>video.pause())}
+
+// ---------- casting: Chromecast / Google TV (Chrome on PC + Android), AirPlay (iPhone / Mac Safari) ----------
+let castCtx=null,castName='';
+const casting=()=>!!(castCtx&&castCtx.getCurrentSession());
+window.__onGCastApiAvailable=ok=>{
+ if(!ok||!window.cast||!cast.framework)return;
+ castCtx=cast.framework.CastContext.getInstance();
+ castCtx.setOptions({receiverApplicationId:chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,autoJoinPolicy:chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED});
+ $('bCast').hidden=false;
+ castCtx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED,e=>{
+  const S=cast.framework.SessionState;
+  if(e.sessionState===S.SESSION_STARTED||e.sessionState===S.SESSION_RESUMED){castName=e.session.getCastDevice().friendlyName||'your TV';$('bCast').classList.add('on');if(cur)castLoad()}
+  if(e.sessionState===S.SESSION_ENDED){$('bCast').classList.remove('on');toast('Stopped casting');if(cur)tune(cur,curSrc,{retry:1});else setScreen('idle')}
+ });
+};
+function castLoad(){
+ const sess=castCtx&&castCtx.getCurrentSession();if(!sess||!cur)return;
+ const g=cur,s=g.sources[curSrc],hlsish=/m3u8/i.test(s.url)||!/\.(mp4|webm)(\?|$)/i.test(s.url);
+ const mi=new chrome.cast.media.MediaInfo(s.url,hlsish?'application/x-mpegURL':'video/mp4');
+ mi.streamType=chrome.cast.media.StreamType.LIVE;
+ if(hlsish){try{mi.hlsSegmentFormat=chrome.cast.media.HlsSegmentFormat.TS;mi.hlsVideoSegmentFormat=chrome.cast.media.HlsVideoSegmentFormat.MPEG2_TS}catch{}}
+ const md=new chrome.cast.media.GenericMediaMetadata();md.title=g.name;md.subtitle='Channel '+g.n+(sub(g)?' · '+sub(g):'');
+ md.images=[new chrome.cast.Image(g.logo||new URL('icon-512.png',location.href).href)];mi.metadata=md;
+ const req=new chrome.cast.media.LoadRequest(mi);req.autoplay=true;
+ stopPlayer();setScreen('cast');
+ $('msgT').textContent='CASTING';$('msgP').textContent=`${g.name} is playing on ${castName}. Swipe or use the guide to change channels on the TV.`;
+ $('msgB').innerHTML='<button class="pill" data-a="castsrc">Try another source</button><button class="pill red" data-a="caststop">Stop casting</button>';
+ sess.loadMedia(req).then(()=>toast('Casting '+g.name),()=>{toast('Your TV couldn’t play this stream');$('msgP').textContent=`${castName} couldn’t play this source of ${g.name}. Try another source or channel.`});
+}
+$('msgB').addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;
+ if(a==='caststop')castCtx?.endCurrentSession(true);
+ if(a==='castsrc'&&cur){const o=cur.order||rankBase(cur);curSrc=o[(o.indexOf(curSrc)+1)%o.length];castLoad()}});
+// AirPlay on Apple devices
+if(window.WebKitPlaybackTargetAvailabilityEvent){
+ video.addEventListener('webkitplaybacktargetavailabilitychanged',e=>{if(e.availability==='available'&&!castCtx){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title='AirPlay'}});
+ video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged',()=>$('bCast').classList.toggle('on',!!video.webkitCurrentPlaybackTargetIsWireless));
+}
+$('bCast').onclick=()=>{
+ if(castCtx){castCtx.requestSession().catch(()=>{});return}
+ if(video.webkitShowPlaybackTargetPicker){if(!cur){toast('Start a channel first');return}video.webkitShowPlaybackTargetPicker();return}
+ toast('Casting works in Chrome on PC and Android, or Safari on iPhone')};
+
+// ---------- install as an app (Android / Chrome / Edge) ----------
+let installEvt=null;
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;document.documentElement.classList.add('can-install')});
+addEventListener('appinstalled',()=>{installEvt=null;document.documentElement.classList.remove('can-install');toast('Open TV installed')});
+$('bInstall2').onclick=()=>$('bInstall').click();
+$('bInstall').onclick=async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch{}installEvt=null;document.documentElement.classList.remove('can-install')};
 // swipe: up = next channel, down = previous, sideways = last channel, tap = show info
 let ts=null;
 $('screen').addEventListener('touchstart',e=>{if(e.touches.length!==1){ts=null;return}const t=e.touches[0];ts={x:t.clientX,y:t.clientY,t:Date.now()}},{passive:true});
 $('screen').addEventListener('touchend',e=>{
- if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t;ts=null;
+ if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t,startY=ts.y;ts=null;
+ if(stage.classList.contains('sheet')){if(Math.abs(dx)<10&&Math.abs(dy)<10||dy>50)closeSheet();return}
+ const r=$('screen').getBoundingClientRect();
+ if($('app').classList.contains('ov')&&!stage.classList.contains('idleui')&&dy<-40&&startY>r.bottom-130){openSheet();return}
  if(dt<700&&Math.abs(dy)>50&&Math.abs(dy)>Math.abs(dx)*1.4){e.preventDefault();step(dy<0?1:-1)}
- else if(dt<700&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.4){e.preventDefault();$('bRecall').click()}
+ else if(dt<700&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.4){e.preventDefault();recall()}
  else if(Math.abs(dx)<10&&Math.abs(dy)<10&&cur){banner()}
 });
 if(TOUCH){const h=document.createElement('div');h.className='hint';h.textContent='Swipe up/down on the video to change channel';$('screen').append(h);setTimeout(()=>h.remove(),6000)}
 if(TOUCH&&innerWidth<=900&&store.get('noinfo',null)===null)store.set('noinfo',true);
-setPanel('noguide','bGuide',store.get('noguide',false));setPanel('noinfo','bInfo',store.get('noinfo',false));
+setPanel('noguide','bGuide',store.get('noguide',false));setPanel('noinfo','bInfo',store.get('noinfo',false));updOv();
 
 // ---------- boot ----------
 setScreen('idle');updateMute();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 load().then(()=>{
+ if(location.hash==='#fav'){F.tab='fav';history.replaceState(null,'',location.pathname)}
  buildFilters();applyFilters();
  $('loading').remove();
  const lc=byId.get(store.get('lastCh',''));

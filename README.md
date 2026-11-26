@@ -1,37 +1,44 @@
-# Open TV for iPhone
+# Open TV
 
-Open TV is a live TV app that runs from your iPhone's Home Screen. It uses the free iptv-org channel database. You can put it online for free with GitHub Pages in about 5 minutes, and you don't need a Mac.
+Open TV is a free live TV app for iPhone, Android and PC. It runs from GitHub Pages and uses the iptv-org channel database.
 
-## 1. Put it online (on any computer)
+## Install it
 
-1. Sign in at https://github.com (or create a free account).
-2. Click **+** (top right) → **New repository**. Name it `open-tv`, set it to **Public**, and click **Create repository**.
-3. On the new repo page, click **uploading an existing file**.
-4. Unzip `open-tv-ios.zip`. Drag **everything inside the folder** into the upload box: `index.html`, `sw.js`, `manifest.webmanifest`, `README.md` and the `icons` folder. Click **Commit changes**.
-5. Go to **Settings** → **Pages**. Under "Branch", choose **main** and **/ (root)**, then click **Save**.
-6. Wait about a minute. Your app will be at
-   `https://YOUR-USERNAME.github.io/open-tv/`
+**iPhone / iPad:** open your Pages link in **Safari** → Share → **Add to Home Screen**.
 
-## 2. Install it on your iPhone
+**Android:** open the link in **Chrome**. Then either tap the red **Install** button at the top of the guide, or open the ⋮ menu and choose **Install app** / **Add to Home screen**.
 
-1. Open that link in **Safari**. It has to be Safari for this step.
-2. Tap the **Share** button (the square with an arrow).
-3. Tap **Add to Home Screen** → **Add**.
-4. Open **Open TV** from your Home Screen. It runs full-screen, with no Safari bars.
+**PC (Chrome or Edge):** click the **Install** button in the guide, or the install icon in the address bar. Open TV then gets its own window.
 
-## Using it
+## Controls
 
-- **Swipe up / down on the video:** next / previous channel
-- **Swipe sideways:** jump back to the last channel
-- **Tap the video:** show the channel banner
-- **☰ Guide / ▤ Details:** hide the channel list or the info panel. With the guide hidden, the video fills the screen.
-- **⛶:** iPhone's own full-screen player. Rotate the phone for landscape.
-- **⧉:** picture-in-picture, so you can keep watching while using other apps
-- **⚙ (in the guide):** settings. This is where you hide geo-blocked or non-24/7 channels, or show plain-http streams.
+| Action | Touch | Mouse / keyboard |
+|---|---|---|
+| Next / previous channel | Swipe up / down on the video | ↓ / ↑, PgDn / PgUp, or the TV remote's CH+/CH− |
+| Back to last channel | Swipe sideways | Backspace |
+| Show channel details | Swipe up on the controls, or tap ⌃ | Scroll up over the video, or click ⌃ |
+| Hide details again | Swipe down, or tap the video | Scroll down, or press Esc |
+| Type a channel number | – | 0–9, then Enter |
+| Try another stream source | – | → |
 
-## Good to know
+The buttons on the control bar are play/pause, sound, favorite, cast, picture-in-picture, fullscreen, guide, dock details, show details and help.
 
-- The first launch downloads the channel database, which takes a few seconds. After that, it opens instantly.
-- Not every channel works. Some are blocked outside their own country, and some streams go offline. When one fails, the app tries the channel's other streams automatically.
-- Streams that start with plain `http://` can't play from a secure `https://` site, so they're hidden by default. You can turn them back on in settings, but most won't play.
-- To update the app later, upload the new `index.html` to the same repo. The app picks up the change the next time it's opened with internet.
+- **Guide button:** hides the channel list. On a phone, the video then fills the screen.
+- **Dock details button:** when details are tucked away, the controls float over the video as a frosted bar, and the details slide up over the picture.
+
+## Casting to a TV
+
+- **PC or Android (Chrome / Edge):** tap the cast button and choose your Chromecast or Google TV. Swiping or picking channels then changes the channel on the TV.
+- **iPhone / Mac (Safari):** the same button is AirPlay. Choose your Apple TV or AirPlay TV.
+- Not every stream will cast. Your TV loads the stream itself, so some servers refuse it. If one won't play, tap **Try another source** or change channel.
+
+## Android extras
+
+- Play/pause and next/previous channel show up on the lock screen and in the notification shade.
+- The back button closes the details panel and menus before it leaves the app.
+- Fullscreen switches to landscape automatically.
+- Android TV remotes work: arrows, CH+/CH−, and play/pause.
+
+## Updating
+
+Upload the changed files to the same GitHub repo. The app updates the next time it's opened with internet.

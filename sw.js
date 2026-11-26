@@ -1,6 +1,6 @@
 // Open TV service worker: app opens instantly and works with a spotty connection.
-const SHELL='otv-shell-v1', DATA='otv-data';
-const SHELL_FILES=['./','index.html','manifest.webmanifest','icons/icon-192.png','icons/icon-512.png','icons/apple-touch-icon.png',
+const SHELL='otv-shell-v2', DATA='otv-data';
+const SHELL_FILES=['./','index.html','manifest.webmanifest','icon-192.png','icon-512.png','apple-touch-icon.png',
   'https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(SHELL).then(c=>c.addAll(SHELL_FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('otv-shell')&&k!==SHELL).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
