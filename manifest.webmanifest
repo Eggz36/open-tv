@@ -4,7 +4,7 @@
   "description": "Free live TV channels from the iptv-org database",
   "start_url": "./",
   "scope": "./",
-  "display": "standalone",
+  "display": "fullscreen",
   "orientation": "landscape",
   "background_color": "#0d0d10",
   "theme_color": "#0d0d10",

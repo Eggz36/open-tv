@@ -31,6 +31,13 @@ LAYOUT: guide column left, screen + controls + channel card right; stacks on pho
 *{box-sizing:border-box;min-width:0}
 html,body{height:100%;width:100%;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html.touch body{position:fixed;inset:0}
+/* tap-to-start: phones need one tap before a page may go fullscreen */
+.fsgate{position:fixed;inset:0;z-index:20;display:none;place-items:center;background:rgba(8,8,10,.72);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);color:#fff;text-align:center}
+.fsgate.show{display:grid}
+.fsgate div{display:grid;justify-items:center;gap:8px;animation:gateIn .45s cubic-bezier(.2,1.4,.4,1)}
+.fsgate svg{width:44px;height:44px;padding:14px;box-sizing:content-box;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
+.fsgate b{font-size:20px;font-weight:700;margin-top:6px}.fsgate span{font-size:14px;color:rgba(255,255,255,.65)}
+@keyframes gateIn{from{opacity:0;transform:scale(.9)}}
 /* no long-press menus, callouts, text selection or image dragging (search box still works) */
 html{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 input,textarea{-webkit-touch-callout:default;-webkit-user-select:text;user-select:text}
@@ -359,6 +366,7 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
 </style>
 </head>
 <body>
+<div class="fsgate" id="fsgate"><div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg><b>Tap to start</b><span>Open TV goes fullscreen</span></div></div>
 <div class="loading" id="loading">
  <div class="spin"></div>
  <h2>Open TV</h2>
@@ -485,7 +493,7 @@ function updPhone(){const h=document.documentElement,shortSide=Math.min(screen.w
 // touch points in the app's own (possibly rotated) frame
 function tp(t){return document.documentElement.classList.contains('rot')?{x:t.clientY,y:-t.clientX}:{x:t.clientX,y:t.clientY}}
 addEventListener('orientationchange',()=>setTimeout(()=>dispatchEvent(new Event('resize')),250));
-updPhone();addEventListener('resize',updPhone);
+updPhone();addEventListener('resize',updPhone);addEventListener('resize',()=>{if(typeof updGate==='function')updGate()});
 const PHONE=()=>document.documentElement.classList.contains('phone'),SMALL=()=>PHONE()||innerWidth<=900;
 const F=Object.assign({q:'',country:'',lang:'',cat:'',tab:'all'},store.get('filters',{}));F.q='';
 let cur=null,curSrc=0,last=null,dir=1,hls=null,tuneId=0,tuneTimer=null,srcState=new Map();
@@ -660,12 +668,12 @@ function playSource(){
  pickSeq++;mediaMeta();
  if(casting()){tuneId++;banner();renderSources();castLoad(true);return}
  const id=++tuneId,g=cur,s=g.sources[curSrc];
- stopPlayer();setScreen('tuning');banner();renderSources();
+ stopPlayer();clearCues();setScreen('tuning');banner();renderSources();
  $('quality').innerHTML='<option value="-1">Auto</option>';renderQ();
  const isHls=/m3u8/i.test(s.url)||!/\.(mp4|webm|ogg|mp3|aac)(\?|$)/i.test(s.url);
  $('quality').hidden=!!(NATIVE||!isHls);
  if(isHls&&!NATIVE&&window.Hls&&Hls.isSupported()){
-  hls=new Hls({enableWorker:true,lowLatencyMode:true,manifestLoadingTimeOut:12000,manifestLoadingMaxRetry:1,levelLoadingMaxRetry:2,fragLoadingMaxRetry:3});
+  hls=new Hls({subtitleDisplay:false,enableWorker:true,lowLatencyMode:true,manifestLoadingTimeOut:12000,manifestLoadingMaxRetry:1,levelLoadingMaxRetry:2,fragLoadingMaxRetry:3});
   hls.on(Hls.Events.MANIFEST_PARSED,(e,d)=>{if(id!==tuneId)return;
    $('quality').innerHTML='<option value="-1">Auto</option>'+d.levels.map((l,i)=>`<option value="${i}">${l.height?l.height+'p':Math.round((l.bitrate||0)/1000)+' kbps'}</option>`).join('');renderCC();renderQ();
    startPlay(id)});
@@ -796,6 +804,16 @@ let autoFS=false,fsSkipTap=false;
 document.addEventListener('touchend',()=>{if(!PHONE()||fsEl())return;const el=$('app'),req=el.requestFullscreen||el.webkitRequestFullscreen;if(!req||/iPhone|iPod/.test(navigator.userAgent))return;
  autoFS=true;fsSkipTap=true;setTimeout(()=>{fsSkipTap=false;autoFS=false},600);
  Promise.resolve(req.call(el,{navigationUI:'hide'})).then(()=>screen.orientation?.lock?.('landscape').catch(()=>{})).catch(()=>{fsSkipTap=false})},{capture:true});
+// show the tap-to-start screen on phones that can go fullscreen (Android/Chrome) whenever they're not fullscreen yet
+const INSTALLED=matchMedia('(display-mode: fullscreen)').matches||matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+function updGate(){const can=PHONE()&&!/iPhone|iPod/.test(navigator.userAgent)&&!!($('app').requestFullscreen||$('app').webkitRequestFullscreen)&&!matchMedia('(display-mode: fullscreen)').matches;
+ $('fsgate').classList.toggle('show',can&&!fsEl())}
+$('fsgate').addEventListener('touchend',e=>{e.preventDefault();e.stopPropagation();const el=$('app'),req=el.requestFullscreen||el.webkitRequestFullscreen;
+ autoFS=true;setTimeout(()=>autoFS=false,600);$('fsgate').classList.remove('show');
+ Promise.resolve(req.call(el,{navigationUI:'hide'})).then(()=>screen.orientation?.lock?.('landscape').catch(()=>{})).catch(()=>{});
+ if(cur&&video.paused&&video.getAttribute('src'))video.play().catch(()=>{})});
+$('fsgate').addEventListener('click',e=>{if(!TOUCH)$('fsgate').classList.remove('show')});
+document.addEventListener('fullscreenchange',()=>setTimeout(updGate,300));document.addEventListener('webkitfullscreenchange',()=>setTimeout(updGate,300));
 function setImmersive(on){$('app').classList.toggle('immersive',on);$('bFull').classList.toggle('on',on);if(on&&!autoFS){closeGuide();closeSheet(true);stage.classList.add('idleui')}else wake()}
 document.addEventListener('fullscreenchange',()=>setImmersive(!!fsEl()));document.addEventListener('webkitfullscreenchange',()=>setImmersive(!!fsEl()));
 $('bFull').onclick=()=>{
@@ -1001,10 +1019,16 @@ let ccPref=store.get('cc',false);
 const ccTracks=()=>[...(video.textTracks||[])].filter(t=>t.kind==='captions'||t.kind==='subtitles');
 let ccTrack=null;
 // Captions are drawn by Open TV itself (centred on the picture, styled from the menu); the browser's own caption drawing is hidden.
+// Only Open TV draws captions: every track stays 'hidden' (data only) so the browser/phone never draws a second copy.
 function setCC(i,save=true){const ts=ccTracks();ccTrack=i>=0?ts[i]||null:null;
  ts.forEach(t=>{if(t!==ccTrack)t.mode='disabled'});
- if(ccTrack){ccTrack.mode=hls?'showing':'hidden';ccTrack.oncuechange=drawSubs}
- if(hls)hls.subtitleDisplay=!!ccTrack;if(save){ccPref=!!ccTrack;store.set('cc',ccPref)}drawSubs();renderCC()}
+ if(ccTrack){ccTrack.mode='hidden';ccTrack.oncuechange=drawSubs}
+ if(hls){hls.subtitleDisplay=false;
+  const st=hls.subtitleTracks||[];if(!ccTrack)hls.subtitleTrack=-1;
+  else{const k=st.findIndex(x=>(x.name&&x.name===ccTrack.label)||(x.lang&&x.lang===ccTrack.language));if(k>=0&&hls.subtitleTrack!==k)hls.subtitleTrack=k}}
+ if(save){ccPref=!!ccTrack;store.set('cc',ccPref)}lastSubs='';drawSubs();renderCC()}
+// throw away captions left over from the previous channel so they can't show up on this one
+function clearCues(){for(const t of [...(video.textTracks||[])]){try{if(t.cues)for(const c of [...t.cues])t.removeCue(c)}catch{}}}
 const CCS={size:{s:['S',.8],m:['M',1],l:['L',1.3],xl:['XL',1.65]},
  color:{white:['White','#ffffff'],yellow:['Yellow','#ffe14d'],cyan:['Cyan','#6fe7ff'],green:['Green','#7dff9a']},
  bg:{box:['Box','rgba(0,0,0,.75)'],soft:['See-through','rgba(0,0,0,.42)'],none:['Outline','transparent']},
@@ -1016,11 +1040,18 @@ function applyCCStyle(){const sb=$('subs').style,st=ccStyle;
  sb.setProperty('--cw',st.font==='bold'?700:500);
  sb.setProperty('--csh',st.bg==='none'?'0 0 3px #000,0 0 3px #000,0 1px 2px #000,0 0 8px rgba(0,0,0,.8)':'none');placeSubs()}
 let subsPreview=false;
-function drawSubs(){const lines=[];
- if(ccTrack&&ccTrack.mode!=='disabled'&&ccTrack.activeCues)for(const c of ccTrack.activeCues)lines.push(...String(c.text||'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').split(/\n/));
- const show=lines.filter(l=>l.trim());const pv=!show.length&&subsPreview;
+let lastSubs='';
+function drawSubs(){let lines=[];const t=video.currentTime,seen=new Set();
+ if(ccTrack&&ccTrack.mode!=='disabled'&&ccTrack.activeCues){
+  const cues=[...ccTrack.activeCues].filter(c=>c.startTime<=t+.25&&c.endTime>=t-.05).sort((a,b)=>a.startTime-b.startTime);
+  for(const c of cues)for(let l of String(c.text||'').replace(/<[^>]+>/g,'').replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').split(/\n/)){
+   l=l.replace(/\s+/g,' ').trim();if(l&&!seen.has(l)){seen.add(l);lines.push(l)}}}
+ lines=lines.slice(-3); // roll-up TV captions repeat rows: show at most the newest three lines, each once
+ const pv=!lines.length&&subsPreview,out=(pv?['This is how captions will look','on Open TV']:lines).join('\n')+(pv?'#p':'');
+ if(out===lastSubs)return;lastSubs=out;
  $('subs').classList.toggle('preview',pv);
- $('subs').innerHTML=(pv?['This is how captions will look','on Open TV']:show).map(l=>`<span>${esc(l)}</span>`).join('<br>')}
+ $('subs').innerHTML=(pv?['This is how captions will look','on Open TV']:lines).map(l=>`<span>${esc(l)}</span>`).join('<br>')}
+video.addEventListener('timeupdate',()=>{if(ccTrack)drawSubs()});video.addEventListener('seeked',()=>{lastSubs='';drawSubs()});
 function placeSubs(){const sc=$('screen'),W=sc.clientWidth,H=sc.clientHeight;if(!W||!H)return;
  const vw=video.videoWidth||16,vh=video.videoHeight||9,ch=Math.min(H,W*vh/vw),cw=Math.min(W,H*vw/vh);
  const land=PHONE()&&innerWidth>innerHeight,ctrl=document.querySelector('.stage').classList.contains('idleui')?0:(land?52:PHONE()?82:92);
@@ -1042,7 +1073,12 @@ function renderQ(){
  $('qList').innerHTML=lv.length>1?`<button class="opt${hls.autoLevelEnabled?' sel':''}" data-q="-1">Auto</button>`+lv.map((l,i)=>`<button class="opt${!hls.autoLevelEnabled&&hls.currentLevel===i?' sel':''}" data-q="${i}">${l.height?l.height+'p':Math.round((l.bitrate||0)/1000)+' kbps'}</button>`).join(''):'<div class="none">Only one quality for this channel.</div>';
 }
 if(video.textTracks&&video.textTracks.addEventListener)['addtrack','removetrack','change'].forEach(ev=>video.textTracks.addEventListener(ev,()=>{
- if(ev==='addtrack'&&ccPref&&(!ccTrack||ccTrack.mode==='disabled')){const ts=ccTracks();if(ts.length){setCC(0,false);return}}renderCC()}));
+ if(ev==='addtrack'&&ccPref&&(!ccTrack||ccTrack.mode==='disabled')){const ts=ccTracks();if(ts.length){setCC(0,false);return}}
+ // never let a second track (or the browser's own renderer) show captions alongside ours
+ for(const t of ccTracks())if(t!==ccTrack&&t.mode!=='disabled')t.mode='disabled';
+ if(ccTrack&&ccTrack.mode==='showing')ccTrack.mode='hidden';
+ if(ccTrack&&ccTrack.mode==='disabled'&&ccPref)ccTrack.mode='hidden';
+ renderCC()}));
 const popOpen=()=>!!document.querySelector('.pop.show');
 function closePop(){document.querySelectorAll('.pop.show').forEach(p=>p.classList.remove('show'));if(subsPreview){subsPreview=false;drawSubs();placeSubs()}}
 function togglePop(id){const open=!$(id).classList.contains('show');closePop();if(open)$(id).classList.add('show');wake()}
@@ -1071,6 +1107,7 @@ setGuide(SMALL()?!store.get('lastCh',''):!store.get('noguide',false),false);
 // ---------- boot ----------
 setScreen('idle');updateMute();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+setTimeout(()=>{try{updGate()}catch{}},0);
 load().then(()=>{
  if(location.hash==='#fav'){F.tab='fav';history.replaceState(null,'',location.pathname)}
  buildFilters();applyFilters();
