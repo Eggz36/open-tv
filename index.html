@@ -614,7 +614,7 @@ stage.addEventListener('wheel',e=>{
  if(!$('app').classList.contains('ov')||e.target.closest('.info')||e.target.closest('.guide'))return;
  const now=Date.now();if(now<wheelLock||Math.abs(e.deltaY)<8)return;
  const open=stage.classList.contains('sheet');
- if(e.deltaY<0&&!open&&!stage.classList.contains('idleui')){openSheet();wheelLock=now+500;e.preventDefault()}
+ if(e.deltaY<0&&!open){openSheet();wheelLock=now+500;e.preventDefault()}
  else if(e.deltaY>0&&open){closeSheet();wheelLock=now+500;e.preventDefault()}
  else if(e.deltaY<0&&stage.classList.contains('idleui')){wake();wheelLock=now+300}
 },{passive:false});
