@@ -686,7 +686,7 @@ function playSource(){
 }
 function startPlay(id){
  video.play().catch(err=>{if(id!==tuneId)return;
-  if(err.name==='NotAllowedError'){video.muted=true;updateMute();video.play().catch(()=>{});toast('Muted to autoplay — press M for sound')}});
+  if(err.name==='NotAllowedError'){video.muted=true;autoMuted=true;updateMute();video.play().catch(()=>{});toast(TOUCH?'Tap anywhere for sound':'Click anywhere for sound')}});
 }
 video.addEventListener('playing',()=>{clearTimeout(tuneTimer);if(!cur)return;srcState.set(cur.sources[curSrc].url,'ok');saveHealth(cur.sources[curSrc].url,1);setScreen(null);renderSources();banner();$('bPlay').innerHTML=ICON.pause;mediaState('playing')});
 video.addEventListener('pause',()=>{$('bPlay').innerHTML=ICON.play;mediaState('paused');if(cur&&!casting())$('screen').classList.add('paused')});
@@ -800,7 +800,10 @@ video.addEventListener('pause',()=>stage.classList.remove('idleui'));
 
 // fullscreen always keeps Open TV's own player (never hands off to the phone's built-in one)
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
-let autoFS=false,fsSkipTap=false;
+let autoFS=false,fsSkipTap=false,autoMuted=false;
+// the browser started the channel muted (autoplay rules): the first tap, click or key turns the sound on instead of pausing
+function soundOn(){if(!autoMuted)return false;autoMuted=false;video.muted=false;if(video.volume===0)video.volume=.8;updateMute();toast('Sound on');fsSkipTap=true;setTimeout(()=>fsSkipTap=false,450);return true}
+['touchend','mousedown','keydown'].forEach(ev=>document.addEventListener(ev,soundOn,{capture:true}));
 document.addEventListener('touchend',()=>{if(!PHONE()||fsEl())return;const el=$('app'),req=el.requestFullscreen||el.webkitRequestFullscreen;if(!req||/iPhone|iPod/.test(navigator.userAgent))return;
  autoFS=true;fsSkipTap=true;setTimeout(()=>{fsSkipTap=false;autoFS=false},600);
  Promise.resolve(req.call(el,{navigationUI:'hide'})).then(()=>screen.orientation?.lock?.('landscape').catch(()=>{})).catch(()=>{fsSkipTap=false})},{capture:true});
@@ -828,7 +831,7 @@ if(!APPLE_WEB)video.disableRemotePlayback=true; // hides Chrome's own overlay ca
 video.addEventListener('webkitbeginfullscreen',()=>{try{video.webkitExitFullscreen()}catch{}});
 // PC: click the picture to pause / play, double-click for fullscreen
 let clickT=null;
-$('screen').addEventListener('click',e=>{if(TOUCH||e.target.closest('button,.pop'))return;if(popOpen()){closePop();return}
+$('screen').addEventListener('click',e=>{if(TOUCH||e.target.closest('button,.pop'))return;if(fsSkipTap){fsSkipTap=false;return}if(popOpen()){closePop();return}
  if(stage.classList.contains('sheet')){closeSheet();return}
  clearTimeout(clickT);clickT=setTimeout(()=>{if(cur)$('bPlay').click()},230)});
 $('screen').addEventListener('dblclick',()=>{clearTimeout(clickT);$('bFull').click()});
@@ -1113,9 +1116,8 @@ load().then(()=>{
  buildFilters();applyFilters();
  $('loading').remove();
  const lc=byId.get(store.get('lastCh',''));
- if(lc){$('msgP').textContent=`Last watched: ${lc.name} (${lc.n}). Pick up where you left off?`;$('msgB').innerHTML=`<button class="pill red" data-a="resume">Resume ${esc(lc.name)}</button><button class="pill" data-a="rand">Random channel</button>`;
-  $('msgB').onclick=e=>{const a=e.target.closest('[data-a]')?.dataset.a;if(a==='resume'){$('msgB').onclick=null;tune(lc)}else if(a==='rand'){$('msgB').onclick=null;random()}};
- }else{$('msgB').innerHTML='<button class="pill red" data-a="rand2">Surprise me</button>';$('msgB').onclick=e=>{if(e.target.closest('[data-a=rand2]')){$('msgB').onclick=null;random()}}}
+ if(lc){tune(lc)} // pick up right where you left off
+ else{$('msgB').innerHTML='<button class="pill red" data-a="rand2">Surprise me</button>';$('msgB').onclick=e=>{if(e.target.closest('[data-a=rand2]')){$('msgB').onclick=null;random()}}}
 }).catch(err=>{
  $('loadmsg').innerHTML='Couldn’t load the iptv-org database: '+esc(err.message)+'<br>Check your connection and <a href="#" onclick="location.reload();return false">try again</a>.';
 });
