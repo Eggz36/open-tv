@@ -36,7 +36,8 @@ button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--acc);outline-offset:2px}
 .app{position:relative;height:100vh;height:100dvh;background:#000;overflow:hidden;overflow:clip}
-.stage:fullscreen{height:100vh;height:100dvh}
+.stage:fullscreen,.app:fullscreen{width:100%;height:100vh;height:100dvh}
+.app:fullscreen{background:#000}
 /* the video always fills the screen; controls, details and guide float over it as frosted glass */
 .app.ov .stage{position:absolute;inset:0;overflow:hidden;overflow:clip;background:#000}
 .app.ov .screen{flex:1;aspect-ratio:auto;max-height:none}
@@ -109,7 +110,8 @@ button{cursor:pointer}
 .flbl{margin:10px 0 2px}
 .fpanel .chips{flex-wrap:wrap;overflow:visible;padding:4px 0 2px}
 .fclear{margin-top:8px;height:34px;padding:0 12px;border-radius:17px;border:1px solid rgba(255,255,255,.18);background:transparent;color:#fff;font-size:13px}
-.search svg{position:absolute;left:11px;top:12px;opacity:.6}
+.search>svg{position:absolute;left:11px;top:12px;opacity:.6}
+.fbtn svg{display:block}
 .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 16px}
 select{height:38px;border-radius:9px;border:1px solid var(--line);background:var(--bg);padding:0 8px;width:100%}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:8px 16px;scrollbar-width:none}
@@ -143,6 +145,17 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .spin{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3.5px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin .8s linear infinite;opacity:0;pointer-events:none;transition:opacity .2s}
 .screen.tuning .spin,.screen.buffering .spin{opacity:1}
 @keyframes spin{to{transform:rotate(360deg)}}
+.bigplay{position:absolute;z-index:3;left:50%;top:50%;width:84px;height:84px;margin:-42px 0 0 -42px;border-radius:50%;border:1px solid rgba(255,255,255,.18);color:#fff;display:grid;place-items:center;
+ background:rgba(30,30,36,.45);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);opacity:0;transform:scale(.8);pointer-events:none;transition:opacity .2s,transform .2s}
+.bigplay svg{width:38px;height:38px;margin-left:5px}
+.screen.paused:not(.tuning):not(.nosig):not(.idle):not(.cast) .bigplay{opacity:1;transform:none;pointer-events:auto}
+.volhud{position:absolute;z-index:4;left:50%;top:18%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:22px;color:#fff;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;
+ background:rgba(30,30,36,.55);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.16);opacity:0;pointer-events:none;transition:opacity .2s}
+.volhud.show{opacity:1}
+.volhud svg{width:20px;height:20px}
+.volhud i{display:block;width:140px;height:6px;border-radius:3px;background:rgba(255,255,255,.25);overflow:hidden}
+.volhud b{display:block;height:100%;width:0;background:#fff;border-radius:3px}
+.volhud span{min-width:38px;text-align:right}
 .loading .spin{position:static;margin:0 auto;opacity:1}
 .osd{position:absolute;top:calc(18px + env(safe-area-inset-top));right:24px;text-align:right;font:700 clamp(34px,5vw,58px)/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);pointer-events:none;opacity:0;transition:opacity .3s}
 .osd small{display:block;margin-top:4px;font-size:.36em;font-weight:500;letter-spacing:0;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.65)}
@@ -278,6 +291,26 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
  .app.ov .bar select{flex:none}
  .app.ov.noguide .stage.idleui:not(.sheet) .bar{transform:translateY(24px)}
 }
+/* phones held sideways: everything compact so the picture stays the star */
+@media (orientation:landscape) and (max-height:540px){
+ .phone .app.ov .bar{bottom:calc(6px + env(safe-area-inset-bottom));padding:3px;border-radius:22px}
+ .phone .app.ov .bar .cbtn,.phone .tbar .cbtn{height:36px;min-width:36px}
+ .phone .cbtn svg{width:19px;height:19px}
+ .phone .tbar{top:calc(6px + env(safe-area-inset-top));padding:2px}
+ .phone .tbar .vol input{width:120px}
+ .phone .guide{top:calc(6px + env(safe-area-inset-top));bottom:calc(52px + env(safe-area-inset-bottom));width:min(340px,48%)}
+ .phone .guide .brand{padding:8px 14px 4px}.phone .guide .brand b{font-size:17px}
+ .phone .row{height:54px}
+ .phone .app.ov .info{top:calc(50px + env(safe-area-inset-top));bottom:calc(52px + env(safe-area-inset-bottom));width:min(380px,52%);padding:14px}
+ .phone .app.ov .info h1{font-size:19px}
+ .phone .osd{top:calc(52px + env(safe-area-inset-top));font-size:30px}
+ .phone .app.ov .banner{padding:20px 14px calc(52px + env(safe-area-inset-bottom))}
+ .phone .banner .logo{width:52px;height:36px}.phone .banner .bt{font-size:16px}
+ .phone .msg h2{font-size:20px}.phone .msg p{font-size:13px}
+ .phone .pop{bottom:calc(52px + env(safe-area-inset-bottom));max-height:calc(100% - 70px)}
+ .phone .bigplay{width:64px;height:64px;margin:-32px 0 0 -32px}.phone .bigplay svg{width:28px;height:28px}
+ .phone .hint{bottom:calc(56px + env(safe-area-inset-bottom))}
+}
 /* phones: no guide/arrow/help buttons (swipe instead), volume bar shown, details slide in from the right */
 .phone #bGuide,.phone #bSheet,.phone #bHelp,.phone .bar select{display:none!important}
 .phone .app.ov .bar .cbtn{min-width:38px;padding:0 6px}
@@ -346,12 +379,13 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
    <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow"></video>
    <div class="spin" aria-hidden="true"></div>
    <div class="subs" id="subs" aria-live="polite"></div>
+   <button class="bigplay" id="bigplay" aria-label="Play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z"/></svg></button>
+   <div class="volhud" id="volhud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><i><b id="volfill"></b></i><span id="volpct"></span></div>
    <div class="msg" id="msg"><h2 id="msgT">No signal</h2><p id="msgP">Pick a channel from the guide, or type a channel number.</p><div class="btns" id="msgB"></div></div>
    <div class="osd" id="osd"></div>
    <div class="entry" id="entry"></div>
    <div class="toast" id="toast"></div>
    <div class="pop" id="ccPop" role="dialog" aria-label="Captions"><h3>Captions</h3><div id="ccList"></div><div class="div"></div><h3>Caption style</h3><div id="ccStyle"></div></div>
-   <div class="pop" id="castPop" role="dialog" aria-label="Cast"><h3>Cast to a TV</h3><div id="castList"></div></div>
    <div class="pop" id="qPop" role="dialog" aria-label="Quality"><h3>Quality</h3><div id="qList"></div></div>
    <div class="banner" id="banner"></div>
   </div>
@@ -624,7 +658,9 @@ function startPlay(id){
   if(err.name==='NotAllowedError'){video.muted=true;updateMute();video.play().catch(()=>{});toast('Muted to autoplay — press M for sound')}});
 }
 video.addEventListener('playing',()=>{clearTimeout(tuneTimer);if(!cur)return;srcState.set(cur.sources[curSrc].url,'ok');saveHealth(cur.sources[curSrc].url,1);setScreen(null);renderSources();banner();$('bPlay').innerHTML=ICON.pause;mediaState('playing')});
-video.addEventListener('pause',()=>{$('bPlay').innerHTML=ICON.play;mediaState('paused')});
+video.addEventListener('pause',()=>{$('bPlay').innerHTML=ICON.play;mediaState('paused');if(cur&&!casting())$('screen').classList.add('paused')});
+video.addEventListener('play',()=>$('screen').classList.remove('paused'));
+video.addEventListener('emptied',()=>$('screen').classList.remove('paused'));
 video.addEventListener('error',()=>{if(!hls&&cur&&video.getAttribute('src'))fail(tuneId,'stream unavailable')});
 video.addEventListener('waiting',()=>{const s=$('screen');if(cur&&!s.classList.contains('tuning')&&!s.classList.contains('nosig'))s.classList.add('buffering')});
 ['playing','canplay','pause'].forEach(ev=>video.addEventListener(ev,()=>$('screen').classList.remove('buffering')));
@@ -729,14 +765,20 @@ document.addEventListener('fullscreenchange',()=>setImmersive(!!fsEl()));documen
 $('bFull').onclick=()=>{
  if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document)?.catch?.(()=>{});return}
  if($('app').classList.contains('immersive')){setImmersive(false);return}
- const req=stage.requestFullscreen||stage.webkitRequestFullscreen;
+ const appEl=$('app'),req=appEl.requestFullscreen||appEl.webkitRequestFullscreen;
  if(req&&!/iPhone|iPod/.test(navigator.userAgent)){
-  const p=req.call(stage,{navigationUI:'hide'});
+  const p=req.call(appEl,{navigationUI:'hide'});
   Promise.resolve(p).then(()=>{if(TOUCH)screen.orientation?.lock?.('landscape').catch(()=>{})}).catch(()=>setImmersive(true))}
  else{setImmersive(true);if(!navigator.standalone)toast('Tip: add Open TV to your Home Screen to hide Safari’s bars')}};
 if(!APPLE_WEB)video.disableRemotePlayback=true; // hides Chrome's own overlay cast icon; Apple keeps AirPlay
 video.addEventListener('webkitbeginfullscreen',()=>{try{video.webkitExitFullscreen()}catch{}});
-$('screen').addEventListener('dblclick',()=>$('bFull').click());
+// PC: click the picture to pause / play, double-click for fullscreen
+let clickT=null;
+$('screen').addEventListener('click',e=>{if(TOUCH||e.target.closest('button,.pop'))return;if(popOpen()){closePop();return}
+ if(stage.classList.contains('sheet')){closeSheet();return}
+ clearTimeout(clickT);clickT=setTimeout(()=>{if(cur)$('bPlay').click()},230)});
+$('screen').addEventListener('dblclick',()=>{clearTimeout(clickT);$('bFull').click()});
+$('bigplay').addEventListener('click',e=>{e.stopPropagation();clearTimeout(clickT);$('bPlay').click()});
 $('screen').addEventListener('mousemove',()=>{if(!TOUCH&&cur&&!$('banner').classList.contains('show'))banner()});
 $('bPip').onclick=async()=>{try{document.pictureInPictureElement?await document.exitPictureInPicture():await video.requestPictureInPicture()}catch{toast('Picture-in-picture not available')}};
 $('btnShuffle').onclick=random;
@@ -812,7 +854,7 @@ function initCast(ok){
  castCtx=cast.framework.CastContext.getInstance();
  castCtx.setOptions({receiverApplicationId:chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,autoJoinPolicy:chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED,resumeSavedSession:true});
  rp=new cast.framework.RemotePlayer();rpc=new cast.framework.RemotePlayerController(rp);
- castCtx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED,()=>{updCastBtn();if($('castPop').classList.contains('show'))renderCastMenu()});
+ castCtx.addEventListener(cast.framework.CastContextEventType.CAST_STATE_CHANGED,updCastBtn);
  castCtx.addEventListener(cast.framework.CastContextEventType.SESSION_STATE_CHANGED,e=>{
   const S=cast.framework.SessionState;
   if(e.sessionState===S.SESSION_STARTED||e.sessionState===S.SESSION_RESUMED){castName=e.session.getCastDevice().friendlyName||'your TV';toast('Connected to '+castName);if(cur&&e.sessionState===S.SESSION_STARTED)castLoad(true);else if(cur)castScreen()}
@@ -866,25 +908,14 @@ function mirrorHint(){const u=navigator.userAgent;
  if(/Chrome/.test(u))return 'Chrome menu (⋮) → Cast, save and share → Cast… → Sources: Cast tab';
  if(/Mac/.test(u))return 'Control Center → Screen Mirroring, then pick your TV';
  return 'Use your device’s screen mirroring or casting feature'}
-function renderCastMenu(){const C=window.cast&&cast.framework&&cast.framework.CastState,st=castStateName(),it=[];
- if(castCtx){
-  if(st===C.CONNECTED)it.push(['gstop','Stop casting to '+castName,'Picture goes back to this device']);
-  else it.push(['gcast','Chromecast / Google TV',st===C.NO_DEVICES_AVAILABLE?'Looking for TVs on your Wi-Fi… tap to search':'Pick a TV on your Wi-Fi'])}
- else if(CAST_CAPABLE)it.push(['gwait','Chromecast / Google TV','Getting ready… try again in a moment']);
- if(video.webkitShowPlaybackTargetPicker)it.push(['air',video.webkitCurrentPlaybackTargetIsWireless?'AirPlay (playing on TV)':'AirPlay','Apple TV and AirPlay TVs (Samsung, LG, Sony, Vizio, Roku)']);
- if(video.remote&&!hls&&!APPLE_WEB&&video.getAttribute('src'))it.push(['rpb','Other nearby devices','Uses your browser’s own device list']);
- it.push(['mirror','Mirror your whole screen',mirrorHint()]);
- it.push(['link','Copy stream link','Paste it into VLC or a TV app on any device']);
- $('castList').innerHTML=it.map(([k,t,s])=>`<button class="opt two" data-cast="${k}"><span><b>${esc(t)}</b><small>${esc(s)}</small></span></button>`).join('')}
-$('bCast').onclick=e=>{e.stopPropagation();renderCastMenu();togglePop('castPop')};
-$('castPop').addEventListener('click',async e=>{e.stopPropagation();const k=e.target.closest('[data-cast]')?.dataset.cast;if(!k)return;
- if(k==='gcast'){closePop();if(!cur){toast('Pick a channel first, then cast it');return}castCtx.requestSession().catch(err=>{if(err!=='cancel'&&err?.code!=='cancel')toast('No TV picked. Make sure the TV and this device are on the same Wi-Fi.')})}
- if(k==='gstop'){closePop();castCtx.endCurrentSession(true)}
- if(k==='gwait')toast('Cast is still loading. Try again in a few seconds.');
- if(k==='air'){closePop();if(!cur){toast('Pick a channel first, then AirPlay it');return}video.webkitShowPlaybackTargetPicker()}
- if(k==='rpb'){closePop();video.remote.prompt().catch(()=>toast('No other devices found'))}
- if(k==='mirror')toast(mirrorHint());
- if(k==='link'){closePop();copyUrl()}});
+// The Cast button goes straight to the device picker, like YouTube
+$('bCast').onclick=e=>{e.stopPropagation();
+ if(!cur){toast('Pick a channel first, then cast it');return}
+ if(castCtx){castCtx.requestSession().catch(err=>{const c=err&&(err.code||err);if(c!=='cancel'&&c!=='session_error')toast('No TV found. Make sure the TV and this device are on the same Wi-Fi.')});return}
+ if(video.webkitShowPlaybackTargetPicker){video.webkitShowPlaybackTargetPicker();return}
+ if(CAST_CAPABLE){toast('Cast is still starting up. Try again in a second.');return}
+ if(video.remote&&video.getAttribute('src')){video.remote.prompt().catch(()=>toast(mirrorHint()));return}
+ toast('This browser can’t cast directly. '+mirrorHint())};
 updCastBtn();
 
 // ---------- install as an app (Android / Chrome / Edge) ----------
@@ -893,22 +924,34 @@ addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEvt=e;docum
 addEventListener('appinstalled',()=>{installEvt=null;document.documentElement.classList.remove('can-install');toast('Open TV installed')});
 $('bInstall2').onclick=()=>$('bInstall').click();
 $('bInstall').onclick=async()=>{if(!installEvt)return;installEvt.prompt();try{await installEvt.userChoice}catch{}installEvt=null;document.documentElement.classList.remove('can-install')};
-// swipe: up = next channel, down = previous, sideways = last channel, tap = show info
-let ts=null;
-// Touch: tap = show/hide controls, swipe up/down = change channel, swipe right = guide, swipe left = details.
-$('screen').addEventListener('touchstart',e=>{if(e.touches.length!==1){ts=null;return}const t=e.touches[0];
- ts={x:t.clientX,y:t.clientY,t:Date.now(),vis:!stage.classList.contains('idleui')||!$('app').classList.contains('noguide')}},{passive:true});
-$('screen').addEventListener('touchend',e=>{
- if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t,vis=ts.vis;ts=null;
- const tap=Math.abs(dx)<12&&Math.abs(dy)<12,vert=dt<800&&Math.abs(dy)>45&&Math.abs(dy)>Math.abs(dx)*1.3,horiz=dt<800&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.3;
+// Touch: tap = pause / play (and shows the controls), hold then slide = volume,
+// swipe up/down = change channel, swipe right = guide, swipe left = details.
+let ts=null,holdT=null,volHudT=null;
+function setVolume(v){v=Math.max(0,Math.min(1,v));
+ if(casting()&&rp){rp.volumeLevel=v;rpc.setVolumeLevel();if(rp.isMuted&&v>0)rpc.muteOrUnmute()}else{video.volume=v;video.muted=v===0;updateMute()}
+ $('vol').value=v;$('volfill').style.width=Math.round(v*100)+'%';$('volpct').textContent=Math.round(v*100)+'%';
+ $('volhud').classList.add('show');clearTimeout(volHudT);volHudT=setTimeout(()=>$('volhud').classList.remove('show'),900)}
+const curVol=()=>casting()&&rp?rp.volumeLevel:(video.muted?0:video.volume);
+$('screen').addEventListener('touchstart',e=>{clearTimeout(holdT);if(e.touches.length!==1||e.target.closest('button')){ts=null;return}const t=e.touches[0];
+ ts={x:t.clientX,y:t.clientY,lx:t.clientX,ly:t.clientY,t:Date.now(),mode:null};
+ holdT=setTimeout(()=>{if(!ts||Math.abs(ts.lx-ts.x)>10||Math.abs(ts.ly-ts.y)>10)return;
+  if(IOS){toast('On iPhone, change the volume with the side buttons');ts.mode='none';return}
+  ts.mode='vol';ts.v0=curVol();ts.x=ts.lx;ts.y=ts.ly;setVolume(ts.v0);navigator.vibrate?.(10)},380)},{passive:true});
+$('screen').addEventListener('touchmove',e=>{if(!ts)return;const t=e.touches[0];ts.lx=t.clientX;ts.ly=t.clientY;
+ if(ts.mode==='vol'){e.preventDefault();const dy=ts.y-ts.ly,dx=ts.lx-ts.x,d=Math.abs(dy)>=Math.abs(dx)?dy:dx;setVolume(ts.v0+d/220)}},{passive:false});
+$('screen').addEventListener('touchcancel',()=>{clearTimeout(holdT);ts=null});
+$('screen').addEventListener('touchend',e=>{clearTimeout(holdT);
+ if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t,mode=ts.mode;ts=null;
+ if(mode){e.preventDefault();return}
+ const tap=Math.abs(dx)<12&&Math.abs(dy)<12&&dt<500,vert=dt<800&&Math.abs(dy)>45&&Math.abs(dy)>Math.abs(dx)*1.3,horiz=dt<800&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.3;
  if(popOpen()){if(tap){e.preventDefault();closePop()}return}
  if(stage.classList.contains('sheet')){if(tap||(horiz&&dx>0)){e.preventDefault();closeSheet()}return}
  if(!$('app').classList.contains('noguide')&&SMALL()){if(tap||(horiz&&dx<0)){e.preventDefault();closeGuide()}return}
- if(tap){e.preventDefault();if(vis&&cur){clearTimeout(idleT);stage.classList.add('idleui')}else{wake();if(cur)banner()}return}
+ if(tap){e.preventDefault();wake();if(cur){$('bPlay').click();if(!video.paused)banner()}return}
  if(vert){e.preventDefault();step(dy<0?1:-1);return}
  if(horiz){e.preventDefault();if(dx>0)openGuide();else openSheet()}
 });
-if(TOUCH){const h=document.createElement('div');h.className='hint';h.innerHTML='Swipe ↑ ↓ to change channel · tap for controls<br>Swipe → for the guide · swipe ← for details';$('screen').append(h);
+if(TOUCH){const h=document.createElement('div');h.className='hint';h.innerHTML='Tap to pause · hold and slide for volume<br>Swipe ↑ ↓ channels · → guide · ← details';$('screen').append(h);
  setTimeout(()=>{h.style.opacity=0;setTimeout(()=>h.remove(),500)},7000)}
 function swipeClose(el,dir,fn){let s0=null;
  el.addEventListener('touchstart',e=>{s0=e.touches.length===1&&!e.target.closest('.chips,input,select')?{x:e.touches[0].clientX,y:e.touches[0].clientY}:null},{passive:true});
@@ -943,7 +986,7 @@ function drawSubs(){const lines=[];
  $('subs').innerHTML=(pv?['This is how captions will look','on Open TV']:show).map(l=>`<span>${esc(l)}</span>`).join('<br>')}
 function placeSubs(){const sc=$('screen'),W=sc.clientWidth,H=sc.clientHeight;if(!W||!H)return;
  const vw=video.videoWidth||16,vh=video.videoHeight||9,ch=Math.min(H,W*vh/vw),cw=Math.min(W,H*vw/vh);
- const ctrl=document.querySelector('.stage').classList.contains('idleui')?0:(PHONE()?82:92);
+ const land=PHONE()&&innerWidth>innerHeight,ctrl=document.querySelector('.stage').classList.contains('idleui')?0:(land?52:PHONE()?82:92);
  let bot=Math.max((H-ch)/2+ch*.07,ctrl+8);
  if(subsPreview&&$('ccPop').classList.contains('show')){const pr=$('ccPop').getBoundingClientRect(),sr=sc.getBoundingClientRect();bot=Math.min(Math.max(bot,sr.bottom-pr.top+14),H-60)}
  const sb=$('subs').style;sb.bottom=bot+'px';sb.left=sb.right=Math.max((W-cw)/2+cw*.06,12)+'px';
@@ -973,7 +1016,7 @@ $('bQ').onclick=e=>{e.stopPropagation();renderQ();togglePop('qPop')};
 $('ccPop').addEventListener('click',e=>{e.stopPropagation();const c=e.target.closest('[data-cc]');if(c){setCC(+c.dataset.cc);setTimeout(closePop,150)}});
 $('qPop').addEventListener('click',e=>{e.stopPropagation();const q=e.target.closest('[data-q]');
  if(q&&hls){hls.currentLevel=+q.dataset.q;$('quality').value=q.dataset.q;renderQ();toast('Quality: '+q.textContent);setTimeout(closePop,150)}});
-document.addEventListener('click',e=>{if(!e.target.closest('.pop,#bCC,#bQ,#bCast'))closePop()});
+document.addEventListener('click',e=>{if(!e.target.closest('.pop,#bCC,#bQ'))closePop()});
 renderCC();renderQ();applyCCStyle();
 addEventListener('resize',placeSubs);video.addEventListener('loadedmetadata',placeSubs);video.addEventListener('resize',placeSubs);
 new MutationObserver(placeSubs).observe(document.querySelector('.stage'),{attributes:true,attributeFilter:['class']});
