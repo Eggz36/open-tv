@@ -38,13 +38,17 @@ html.touch body{position:fixed;inset:0}
 .fsgate svg{width:44px;height:44px;padding:14px;box-sizing:content-box;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2)}
 .fsgate b{font-size:20px;font-weight:700;margin-top:6px}.fsgate span{font-size:14px;color:rgba(255,255,255,.65)}
 @keyframes gateIn{from{opacity:0;transform:scale(.9)}}
+/* TV mode (page mirrored to a Chromecast): picture only */
+.tvmode .bar,.tvmode .tbar,.tvmode .guide,.tvmode .banner,.tvmode .hint,.tvmode .osd,.tvmode .toast,.tvmode .fsgate{display:none!important}
+.tvmode .stage{cursor:none}
 /* no long-press menus, callouts, text selection or image dragging (search box still works) */
 html{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
 input,textarea{-webkit-touch-callout:default;-webkit-user-select:text;user-select:text}
 img,video,svg{-webkit-user-drag:none;user-drag:none}
 /* phone held upright: show the app sideways anyway (turn the phone to watch) */
 html.rot{--sa-t:env(safe-area-inset-right);--sa-r:env(safe-area-inset-bottom);--sa-b:env(safe-area-inset-left);--sa-l:env(safe-area-inset-top)}
-html.rot body{inset:auto;top:0;left:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
+html.rot body{inset:auto;top:0;left:0;width:100vh;height:100vw;transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
+html.touch .app{height:100%}
 html.rot .app{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Space Grotesk",system-ui,sans-serif;overflow:hidden}
 button,input,select{font:inherit;color:inherit}
@@ -489,7 +493,14 @@ const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(naviga
 if(IOS)document.documentElement.classList.add('ios');
 const APPLE_WEB=IOS||(/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|Edg|Android/.test(navigator.userAgent));
 function updPhone(){const h=document.documentElement,shortSide=Math.min(screen.width||innerWidth,screen.height||innerHeight),ph=TOUCH&&(shortSide<=540||innerWidth<=900||innerHeight<=540);
- h.classList.toggle('phone',ph);h.classList.toggle('rot',ph&&innerHeight>innerWidth)}
+ h.classList.toggle('phone',ph);h.classList.toggle('rot',ph&&innerHeight>innerWidth);fitIOS()}
+// iPhone reports the wrong height in Home Screen apps (WebKit bug), leaving an empty strip; size from the real screen instead
+function fitIOS(){if(!IOS||!document.body)return;const b=document.body.style,h=document.documentElement,rot=h.classList.contains('rot');
+ const st=navigator.standalone||matchMedia('(display-mode: standalone)').matches||matchMedia('(display-mode: fullscreen)').matches;
+ if(st){const L=Math.max(screen.width,screen.height),S=Math.min(screen.width,screen.height),land=rot||innerWidth>innerHeight;
+  b.inset='auto';b.top='0';b.left='0';b.width=(land?L:S)+'px';b.height=(land?S:L)+'px'}
+ else if(rot){b.width=Math.max(innerHeight,document.documentElement.clientHeight)+'px';b.height=innerWidth+'px'}
+ else{b.width=b.height=b.inset=b.top=b.left=''}}
 // touch points in the app's own (possibly rotated) frame
 function tp(t){return document.documentElement.classList.contains('rot')?{x:t.clientY,y:-t.clientX}:{x:t.clientX,y:t.clientY}}
 addEventListener('orientationchange',()=>setTimeout(()=>dispatchEvent(new Event('resize')),250));
@@ -947,12 +958,23 @@ async function castLoad(fresh){
  sess.loadMedia(req).then(()=>{if(id!==castSeq)return;castScreen();toast(g.name+' is playing on '+castName)},()=>{if(id!==castSeq)return;
   const nx=(g.order||rankBase(g)).find(i=>!castTried.has(i));
   if(nx!=null){curSrc=nx;toast('Trying another source on the TV…');castLoad(false);return}
-  castScreen();$('msgP').textContent=`${castName} couldn’t play ${g.name}. Some channels only work on this device. Try another channel, or mirror your screen from the Cast menu.`})}
+  castScreen();$('msgP').textContent=`${castName} couldn’t load ${g.name} by itself (the channel blocks TVs from fetching it). Tap “Mirror to TV” and this device will play it and send the picture instead.`;
+  $('msgB').innerHTML='<button class="pill red" data-a="mirror">Mirror to TV</button><button class="pill" data-a="caststop">Stop casting</button>'})}
+// Mirror mode: Chrome plays Open TV's own player and streams the picture to the Chromecast / Google TV (works for channels the TV can't fetch)
+let presConn=null;
+function mirrorToTV(){if(!('PresentationRequest' in window)||!cur)return false;
+ const u=new URL(location.pathname,location.origin);u.searchParams.set('tv',cur.id);
+ try{const req=new PresentationRequest([u.href]);
+  req.start().then(c=>{presConn=c;toast('Showing '+cur.name+' on your TV');c.onterminate=c.onclose=()=>{presConn=null;toast('Stopped mirroring')}})
+   .catch(err=>{if(err&&err.name!=='AbortError'&&err.name!=='NotAllowedError')toast('Couldn’t mirror here. '+mirrorHint())});return true}catch{return false}}
 $('msgB').addEventListener('click',e=>{const a=e.target.closest('[data-a]')?.dataset.a;
  if(a==='caststop'){if(castCtx&&casting())castCtx.endCurrentSession(true);else if(video.webkitShowPlaybackTargetPicker)video.webkitShowPlaybackTargetPicker()}
+ if(a==='mirror'){mirrorToTV();return}
  if(a==='castsrc'&&cur&&casting()){const o=cur.order||rankBase(cur);curSrc=o[(o.indexOf(curSrc)+1)%o.length];castLoad(false)}});
 // AirPlay: the app shows when the picture is on the TV
+let airplayAvail=null;
 if(window.WebKitPlaybackTargetAvailabilityEvent){
+ video.addEventListener('webkitplaybacktargetavailabilitychanged',e=>{airplayAvail=e.availability==='available'});
  video.addEventListener('webkitcurrentplaybacktargetiswirelesschanged',()=>{const on=!!video.webkitCurrentPlaybackTargetIsWireless;updCastBtn();
   if(on&&cur){$('screen').classList.add('cast');$('msgT').textContent='Playing on AirPlay';$('msgP').textContent=`${cur.name} is on your TV. Change channels here; to stop, open Cast and choose AirPlay → this device.`;$('msgB').innerHTML='<button class="pill red" data-a="caststop">Choose device</button>'}
   else $('screen').classList.remove('cast')});
@@ -969,7 +991,12 @@ function mirrorHint(){const u=navigator.userAgent;
 $('bCast').onclick=e=>{e.stopPropagation();
  if(!cur){toast('Pick a channel first, then cast it');return}
  if(castCtx){castCtx.requestSession().catch(err=>{const c=err&&(err.code||err);if(c!=='cancel'&&c!=='session_error')toast('No TV found. Make sure the TV and this device are on the same Wi-Fi.')});return}
- if(video.webkitShowPlaybackTargetPicker){video.webkitShowPlaybackTargetPicker();return}
+ if(video.webkitShowPlaybackTargetPicker){
+  // Home Screen apps can't AirPlay reliably (iOS limitation): hand the stream to Safari's own player, whose AirPlay button works
+  if(navigator.standalone||matchMedia('(display-mode: standalone)').matches){const u=cur.sources[curSrc].url;toast('Opening Safari’s player: tap the AirPlay icon there, then pick your TV');window.open(u,'_blank');return}
+  if(airplayAvail===false)toast('No AirPlay TV found yet. Make sure the TV is on the same Wi-Fi with AirPlay turned on.');
+  video.webkitShowPlaybackTargetPicker();return}
+ if(!APPLE_WEB&&'PresentationRequest' in window&&mirrorToTV())return;
  if(CAST_CAPABLE){toast('Cast is still starting up. Try again in a second.');return}
  if(video.remote&&video.getAttribute('src')){video.remote.prompt().catch(()=>toast(mirrorHint()));return}
  toast('This browser can’t cast directly. '+mirrorHint())};
@@ -1115,6 +1142,8 @@ load().then(()=>{
  if(location.hash==='#fav'){F.tab='fav';history.replaceState(null,'',location.pathname)}
  buildFilters();applyFilters();
  $('loading').remove();
+ const tvId=new URLSearchParams(location.search).get('tv');
+ if(tvId&&byId.get(tvId)){document.documentElement.classList.add('tvmode');setGuide(false,false);tune(byId.get(tvId));return}
  const lc=byId.get(store.get('lastCh',''));
  if(lc){tune(lc)} // pick up right where you left off
  else{$('msgB').innerHTML='<button class="pill red" data-a="rand2">Surprise me</button>';$('msgB').onclick=e=>{if(e.target.closest('[data-a=rand2]')){$('msgB').onclick=null;random()}}}
