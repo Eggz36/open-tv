@@ -149,6 +149,7 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .spin{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3.5px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin .8s linear infinite;opacity:0;pointer-events:none;transition:opacity .2s}
 .screen.tuning .spin,.screen.buffering .spin{opacity:1}
 @keyframes spin{to{transform:rotate(360deg)}}
+#bigplay{display:none!important} /* centre play/pause removed by request */
 .bigplay{position:absolute;z-index:3;left:50%;top:50%;width:86px;height:86px;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.2);color:#fff;
  background:rgba(30,30,36,.42);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16);
  transform:translate(-50%,-50%) scale(.7);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .38s cubic-bezier(.2,1.5,.4,1)}
