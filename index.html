@@ -27,10 +27,14 @@ PICTURE: the live picture itself, with static between channels and a big phospho
 COLOUR/TYPE: charcoal glass, white text, one signal-red accent; Space Grotesk throughout
 LAYOUT: guide column left, screen + controls + channel card right; stacks on phones
 */
-:root{--bg:#0d0d10;--panel:#16161b;--panel2:#1e1e25;--line:#2a2a33;--ink:#f2f1ee;--dim:#9a99a3;--acc:#ff3b30;--ok:#34c759;--warn:#ffb020;color-scheme:dark}
+:root{--sa-t:env(safe-area-inset-top);--sa-r:env(safe-area-inset-right);--sa-b:env(safe-area-inset-bottom);--sa-l:env(safe-area-inset-left);--bg:#0d0d10;--panel:#16161b;--panel2:#1e1e25;--line:#2a2a33;--ink:#f2f1ee;--dim:#9a99a3;--acc:#ff3b30;--ok:#34c759;--warn:#ffb020;color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 html,body{height:100%;width:100%;overflow:hidden;overscroll-behavior:none;-webkit-text-size-adjust:100%;text-size-adjust:100%}
 html.touch body{position:fixed;inset:0}
+/* phone held upright: show the app sideways anyway (turn the phone to watch) */
+html.rot{--sa-t:env(safe-area-inset-right);--sa-r:env(safe-area-inset-bottom);--sa-b:env(safe-area-inset-left);--sa-l:env(safe-area-inset-top)}
+html.rot body{inset:auto;top:0;left:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform-origin:0 0;transform:rotate(90deg) translateY(-100%)}
+html.rot .app{height:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 "Space Grotesk",system-ui,sans-serif;overflow:hidden}
 button,input,select{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -42,7 +46,7 @@ button{cursor:pointer}
 .app.ov .stage{position:absolute;inset:0;overflow:hidden;overflow:clip;background:#000}
 .app.ov .screen{flex:1;aspect-ratio:auto;max-height:none}
 .glass{background:rgba(44,44,50,.34);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.14)}
-.app.ov .bar{position:absolute;left:50%;bottom:calc(14px + env(safe-area-inset-bottom));transform:translateX(-50%);width:max-content;max-width:calc(100% - 20px);z-index:4;border-radius:28px;padding:6px;gap:2px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;transition:opacity .35s,transform .35s;
+.app.ov .bar{position:absolute;left:50%;bottom:calc(14px + var(--sa-b));transform:translateX(-50%);width:max-content;max-width:calc(100% - 20px);z-index:4;border-radius:28px;padding:6px;gap:2px;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;transition:opacity .35s,transform .35s;
  background:rgba(44,44,50,.34);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.14)}
 .app.ov .bar::-webkit-scrollbar{display:none}
 .app.ov .bar .cbtn{background:transparent;color:#fff;border-radius:22px}
@@ -53,10 +57,10 @@ button{cursor:pointer}
 .app.ov .bar .sp{display:none}
 .app.ov.noguide .stage.idleui:not(.sheet) .bar{opacity:0;transform:translate(-50%,24px);pointer-events:none}
 .app.ov.noguide .stage.idleui:not(.sheet){cursor:none}
-.app.ov .banner{padding-bottom:calc(86px + env(safe-area-inset-bottom))}
+.app.ov .banner{padding-bottom:calc(86px + var(--sa-b))}
 .app.ov .stage.sheet #bSheet{background:rgba(255,255,255,.2)}
 /* details as a frosted sheet that slides up over the video */
-.app.ov .info{position:absolute;left:50%;bottom:calc(76px + env(safe-area-inset-bottom));width:min(820px,calc(100% - 20px));max-height:min(62%,560px);overflow:auto;z-index:4;border-radius:24px;padding:22px;color:#fff;
+.app.ov .info{position:absolute;left:50%;bottom:calc(76px + var(--sa-b));width:min(820px,calc(100% - 20px));max-height:min(62%,560px);overflow:auto;z-index:4;border-radius:24px;padding:22px;color:#fff;
  background:rgba(30,30,36,.5);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
  transform:translate(-50%,calc(100% + 120px));opacity:0;pointer-events:none;transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .3s}
 .app.ov .stage.sheet .info{transform:translate(-50%,0);opacity:1;pointer-events:auto}
@@ -68,7 +72,7 @@ button{cursor:pointer}
 .screen.cast .msg{display:grid}
 .screen.cast video{opacity:0}
 /* guide */
-.guide{position:absolute;z-index:6;top:calc(10px + env(safe-area-inset-top));bottom:calc(10px + env(safe-area-inset-bottom));left:calc(10px + env(safe-area-inset-left));width:min(390px,calc(100% - 20px));
+.guide{position:absolute;z-index:6;top:calc(10px + var(--sa-t));bottom:calc(10px + var(--sa-b));left:calc(10px + var(--sa-l));width:min(390px,calc(100% - 20px));
  display:flex;flex-direction:column;overflow:hidden;border-radius:24px;color:#fff;
  background:rgba(26,26,32,.52);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
  transition:transform .42s cubic-bezier(.2,.8,.2,1),opacity .3s}
@@ -149,15 +153,14 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
  background:rgba(30,30,36,.42);-webkit-backdrop-filter:blur(22px) saturate(160%);backdrop-filter:blur(22px) saturate(160%);box-shadow:0 10px 30px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.16);
  transform:translate(-50%,-50%) scale(.7);opacity:0;pointer-events:none;transition:opacity .25s ease,transform .38s cubic-bezier(.2,1.5,.4,1)}
 .bigplay svg{position:absolute;left:50%;top:50%;width:36px;height:36px;margin:-18px 0 0 -18px;transition:opacity .22s ease,transform .38s cubic-bezier(.2,1.5,.4,1)}
-.bigplay .ic-play{transform:translateX(2px)}
-.screen.paused .bigplay .ic-pause,.screen:not(.paused) .bigplay .ic-play{opacity:0;transform:scale(.3) rotate(-90deg)}
+.screen.paused .bigplay .ic-play,.screen:not(.paused) .bigplay .ic-pause{opacity:0;transform:scale(.3) rotate(-90deg)}
 .bigplay::after{content:"";position:absolute;inset:-1px;border-radius:50%;border:2px solid rgba(255,255,255,.55);opacity:0;pointer-events:none}
 .bigplay.pop{animation:bpPop .42s cubic-bezier(.2,1.4,.4,1)}
 .bigplay.pop::after{animation:bpRing .55s ease-out}
 @keyframes bpPop{0%{transform:translate(-50%,-50%) scale(1)}35%{transform:translate(-50%,-50%) scale(.84)}70%{transform:translate(-50%,-50%) scale(1.08)}100%{transform:translate(-50%,-50%) scale(1)}}
 @keyframes bpRing{0%{opacity:.7;transform:scale(1)}100%{opacity:0;transform:scale(1.55)}}
-/* shown with the player controls; while paused it stays up; hidden while loading, on No signal, casting, or under the details panel */
-.stage:not(.idleui) .screen.live .bigplay,.screen.live.paused .bigplay{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
+/* paused: shows the pause icon and stays; pressing play flashes the play icon, then it hides. Hidden while loading, on No signal, casting, or under details */
+.screen.live.paused .bigplay,.screen.live .bigplay.flash{opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto}
 .screen.tuning .bigplay,.screen.nosig .bigplay,.screen.idle .bigplay,.screen.cast .bigplay,.stage.sheet .bigplay{opacity:0!important;pointer-events:none!important;transform:translate(-50%,-50%) scale(.7)!important}
 .volhud{position:absolute;z-index:4;left:50%;top:18%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:22px;color:#fff;font-weight:600;font-size:14px;font-variant-numeric:tabular-nums;
  background:rgba(30,30,36,.55);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.16);opacity:0;pointer-events:none;transition:opacity .2s}
@@ -167,7 +170,7 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .volhud b{display:block;height:100%;width:0;background:#fff;border-radius:3px}
 .volhud span{min-width:38px;text-align:right}
 .loading .spin{position:static;margin:0 auto;opacity:1}
-.osd{position:absolute;top:calc(18px + env(safe-area-inset-top));right:24px;text-align:right;font:700 clamp(34px,5vw,58px)/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);pointer-events:none;opacity:0;transition:opacity .3s}
+.osd{position:absolute;top:calc(18px + var(--sa-t));right:24px;text-align:right;font:700 clamp(34px,5vw,58px)/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);pointer-events:none;opacity:0;transition:opacity .3s}
 .osd small{display:block;margin-top:4px;font-size:.36em;font-weight:500;letter-spacing:0;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.65)}
 .osd.show{opacity:1}
 .msg{position:absolute;inset:0;display:none;place-content:center;text-align:center;gap:12px;padding:20px}
@@ -186,9 +189,9 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .tag{font-size:12px;padding:2px 8px;border-radius:5px;background:rgba(255,255,255,.12);color:#ddd;white-space:nowrap}
 .tag.live{background:var(--acc);color:#fff;font-weight:700}
 .tag.w{background:rgba(255,176,32,.2);color:var(--warn)}
-.entry{position:absolute;left:24px;top:calc(18px + env(safe-area-inset-top));font:700 40px/1 "Space Grotesk",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);display:none}
+.entry{position:absolute;left:24px;top:calc(18px + var(--sa-t));font:700 40px/1 "Space Grotesk",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);display:none}
 .entry.show{display:block}
-.toast{position:absolute;z-index:7;left:50%;top:calc(18px + env(safe-area-inset-top));transform:translateX(-50%);background:rgba(0,0,0,.8);padding:7px 14px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center;line-height:1.35}
+.toast{position:absolute;z-index:7;left:50%;top:calc(18px + var(--sa-t));transform:translateX(-50%);background:rgba(0,0,0,.8);padding:7px 14px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:calc(100% - 32px);text-align:center;line-height:1.35}
 .toast.show{opacity:1}
 /* control bar */
 .bar{display:flex;align-items:center;gap:4px;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
@@ -225,7 +228,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 .chk{display:flex;gap:8px;align-items:center;padding:6px 0;font-size:14px}
 .chk input{width:18px;height:18px;accent-color:var(--acc)}
 @media(max-width:900px),(pointer:coarse) and (max-height:540px){
- .guide{bottom:calc(80px + env(safe-area-inset-bottom))}
+ .guide{bottom:calc(80px + var(--sa-b))}
  .info{grid-template-columns:1fr}
  .info h1{font-size:22px}
  .cbtn{flex:none;padding:0 10px}
@@ -240,13 +243,13 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 .touch body,.touch .screen{touch-action:manipulation}
 .touch .screen{touch-action:none}
 @media(max-width:900px),(pointer:coarse) and (max-height:540px){
- .app.ov .bar{padding:5px;gap:0;bottom:calc(10px + env(safe-area-inset-bottom));border-radius:26px}
+ .app.ov .bar{padding:5px;gap:0;bottom:calc(10px + var(--sa-b));border-radius:26px}
  .app.ov .bar .cbtn{min-width:40px;height:42px;padding:0 8px}
  .app.ov .bar select{max-width:88px;height:34px;font-size:14px;padding:0 4px}
  .cbtn svg{width:21px;height:21px}
- .app.ov .info{bottom:calc(68px + env(safe-area-inset-bottom));max-height:min(64%,560px)}
- .app.ov .banner{padding-bottom:calc(74px + env(safe-area-inset-bottom))}
- .guide{bottom:calc(72px + env(safe-area-inset-bottom))}
+ .app.ov .info{bottom:calc(68px + var(--sa-b));max-height:min(64%,560px)}
+ .app.ov .banner{padding-bottom:calc(74px + var(--sa-b))}
+ .guide{bottom:calc(72px + var(--sa-b))}
  .osd{font-size:clamp(30px,9vw,44px)}
  .msg h2{font-size:clamp(22px,6vw,28px)}
  .msg p{font-size:14px}
@@ -259,7 +262,7 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 .ios .vol input{display:none!important}
 .ios .tbar .vol{padding-right:0}
 /* captions & quality menu */
-.pop{position:absolute;z-index:8;left:50%;bottom:calc(80px + env(safe-area-inset-bottom));transform:translate(-50%,12px);width:min(280px,calc(100% - 20px));max-height:min(60%,420px);overflow:auto;padding:12px;border-radius:20px;color:#fff;
+.pop{position:absolute;z-index:8;left:50%;bottom:calc(80px + var(--sa-b));transform:translate(-50%,12px);width:min(280px,calc(100% - 20px));max-height:min(60%,420px);overflow:auto;padding:12px;border-radius:20px;color:#fff;
  background:rgba(30,30,36,.55);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 18px 50px rgba(0,0,0,.45),inset 0 1px 0 rgba(255,255,255,.14);
  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
 .pop.show{opacity:1;pointer-events:auto;transform:translate(-50%,0)}
@@ -287,13 +290,13 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
 .pop .opt.two b{font-weight:600;font-size:15px}
 .pop .opt.two small{font-size:12.5px;color:rgba(255,255,255,.62);line-height:1.3}
 #castPop{width:min(330px,calc(100% - 20px))}
-.phone #castPop{top:calc(62px + env(safe-area-inset-top));bottom:auto;transform:translateY(-12px)}
+.phone #castPop{top:calc(62px + var(--sa-t));bottom:auto;transform:translateY(-12px)}
 .phone #castPop.show{transform:none}
 #bCast.connecting svg{animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.35}}
 /* phones (portrait or landscape): controls stretch across the whole width; PC keeps the floating island */
 @media(max-width:900px),(pointer:coarse) and (max-height:540px){
- .app.ov .bar,.app:not(.noguide) .bar{left:calc(8px + env(safe-area-inset-left));right:calc(8px + env(safe-area-inset-right));width:auto;max-width:none;transform:none;justify-content:space-between;padding:5px 4px}
+ .app.ov .bar,.app:not(.noguide) .bar{left:calc(8px + var(--sa-l));right:calc(8px + var(--sa-r));width:auto;max-width:none;transform:none;justify-content:space-between;padding:5px 4px}
  .app.ov .bar .cbtn{flex:1 1 0}
  .app.ov .bar .vol{flex:2.5 1 0;display:flex;align-items:center;gap:2px}
  .app.ov .bar .vol .cbtn{flex:none}
@@ -302,53 +305,52 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
  .app.ov.noguide .stage.idleui:not(.sheet) .bar{transform:translateY(24px)}
 }
 /* phones held sideways: everything compact so the picture stays the star */
-@media (orientation:landscape) and (max-height:540px){
- .phone .app.ov .bar{bottom:calc(6px + env(safe-area-inset-bottom));padding:3px;border-radius:22px}
- .phone .app.ov .bar .cbtn,.phone .tbar .cbtn{height:36px;min-width:36px}
- .phone .cbtn svg{width:19px;height:19px}
- .phone .tbar{top:calc(6px + env(safe-area-inset-top));padding:2px}
- .phone .tbar .vol input{width:120px}
- .phone .guide{top:calc(6px + env(safe-area-inset-top));bottom:calc(52px + env(safe-area-inset-bottom));width:min(340px,48%)}
- .phone .guide .brand{padding:8px 14px 4px}.phone .guide .brand b{font-size:17px}
- .phone .row{height:54px}
- .phone .app.ov .info{top:calc(50px + env(safe-area-inset-top));bottom:calc(52px + env(safe-area-inset-bottom));width:min(380px,52%);padding:14px}
- .phone .app.ov .info h1{font-size:19px}
- .phone .osd{top:calc(52px + env(safe-area-inset-top));font-size:30px}
- .phone .app.ov .banner{padding:20px 14px calc(52px + env(safe-area-inset-bottom))}
- .phone .banner .logo{width:52px;height:36px}.phone .banner .bt{font-size:16px}
- .phone .msg h2{font-size:20px}.phone .msg p{font-size:13px}
- .phone .pop{bottom:calc(52px + env(safe-area-inset-bottom));max-height:calc(100% - 70px)}
- .phone .bigplay{width:66px;height:66px}.phone .bigplay svg{width:28px;height:28px;margin:-14px 0 0 -14px}
- .phone .hint{bottom:calc(56px + env(safe-area-inset-bottom))}
-}
 /* phones: no guide/arrow/help buttons (swipe instead), volume bar shown, details slide in from the right */
 .phone #bGuide,.phone #bSheet,.phone #bHelp,.phone .bar select{display:none!important}
 .phone .app.ov .bar .cbtn{min-width:38px;padding:0 6px}
 /* phones: iPhone-player layout. Top-left: fullscreen + picture-in-picture. Top-right: AirPlay/cast + volume. Bottom: the rest. */
 .tbar{display:none}
-.phone .tbar{display:flex;align-items:center;gap:2px;position:absolute;z-index:4;top:calc(10px + env(safe-area-inset-top));padding:3px;border-radius:24px;
+.phone .tbar{display:flex;align-items:center;gap:2px;position:absolute;z-index:4;top:calc(10px + var(--sa-t));padding:3px;border-radius:24px;
  background:rgba(44,44,50,.34);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.14);transition:opacity .35s,transform .35s}
 .phone .tbar:empty{display:none}
-#tbarL{left:calc(10px + env(safe-area-inset-left))}
-#tbarR{right:calc(10px + env(safe-area-inset-right))}
+#tbarL{left:calc(10px + var(--sa-l))}
+#tbarR{right:calc(10px + var(--sa-r))}
 .tbar .cbtn{background:transparent;color:#fff;border-radius:20px;min-width:40px;height:40px;padding:0 8px}
 .tbar .vol{display:flex;align-items:center;gap:2px;padding-right:10px}
 .phone .tbar .vol input{display:block;flex:none;width:clamp(70px,26vw,120px)}
 .app.ov.noguide .stage.idleui:not(.sheet) .tbar{opacity:0;transform:translateY(-16px);pointer-events:none}
-.phone .osd{top:calc(112px + env(safe-area-inset-top))}
-.phone .entry{top:calc(112px + env(safe-area-inset-top))}
-.phone .toast{top:calc(64px + env(safe-area-inset-top))}
-.phone .hint{top:auto;bottom:calc(150px + env(safe-area-inset-bottom))}
-.phone .app.ov .info{left:auto;right:calc(10px + env(safe-area-inset-right));top:calc(62px + env(safe-area-inset-top));bottom:calc(72px + env(safe-area-inset-bottom));
+.phone .osd{top:calc(112px + var(--sa-t))}
+.phone .entry{top:calc(112px + var(--sa-t))}
+.phone .toast{top:calc(64px + var(--sa-t))}
+.phone .hint{top:auto;bottom:calc(150px + var(--sa-b))}
+.phone .app.ov .info{left:auto;right:calc(10px + var(--sa-r));top:calc(62px + var(--sa-t));bottom:calc(72px + var(--sa-b));
  width:min(390px,calc(100% - 20px));max-height:none;grid-template-columns:1fr;transform:translateX(calc(100% + 30px))}
 .phone .app.ov .stage.sheet .info{transform:none}
 .phone .app.ov .info::before{display:none}
-.phone .pop{left:auto;right:calc(10px + env(safe-area-inset-right));transform:translateY(12px);bottom:calc(68px + env(safe-area-inset-bottom))}
+.phone .pop{left:auto;right:calc(10px + var(--sa-r));transform:translateY(12px);bottom:calc(68px + var(--sa-b))}
 .phone .pop.show{transform:none}
 .install{display:none}.can-install .install{display:inline-flex;align-items:center;justify-content:center;text-align:center;line-height:1}
 .touch .row:hover{background:transparent}
-.hint{position:absolute;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);font-size:13px;color:#fff;background:rgba(30,30,36,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:8px 14px;border-radius:14px;pointer-events:none;text-align:center;line-height:1.4;width:max-content;max-width:calc(100% - 32px);transition:opacity .4s}
+.hint{position:absolute;left:50%;top:calc(70px + var(--sa-t));transform:translateX(-50%);font-size:13px;color:#fff;background:rgba(30,30,36,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:8px 14px;border-radius:14px;pointer-events:none;text-align:center;line-height:1.4;width:max-content;max-width:calc(100% - 32px);transition:opacity .4s}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spin{animation-duration:1.6s}}
+/* phones are always landscape: compact controls so the picture stays the star */
+ .phone .app.ov .bar{bottom:calc(6px + var(--sa-b));padding:3px;border-radius:22px}
+ .phone .app.ov .bar .cbtn,.phone .tbar .cbtn{height:36px;min-width:36px}
+ .phone .cbtn svg{width:19px;height:19px}
+ .phone .tbar{top:calc(6px + var(--sa-t));padding:2px}
+ .phone .tbar .vol input{width:120px}
+ .phone .guide{top:calc(6px + var(--sa-t));bottom:calc(52px + var(--sa-b));width:min(340px,48%)}
+ .phone .guide .brand{padding:8px 14px 4px}.phone .guide .brand b{font-size:17px}
+ .phone .row{height:54px}
+ .phone .app.ov .info{top:calc(50px + var(--sa-t));bottom:calc(52px + var(--sa-b));width:min(380px,52%);padding:14px}
+ .phone .app.ov .info h1{font-size:19px}
+ .phone .osd{top:calc(52px + var(--sa-t));font-size:30px}
+ .phone .app.ov .banner{padding:20px 14px calc(52px + var(--sa-b))}
+ .phone .banner .logo{width:52px;height:36px}.phone .banner .bt{font-size:16px}
+ .phone .msg h2{font-size:20px}.phone .msg p{font-size:13px}
+ .phone .pop{bottom:calc(52px + var(--sa-b));max-height:calc(100% - 70px)}
+ .phone .bigplay{width:66px;height:66px}.phone .bigplay svg{width:28px;height:28px;margin:-14px 0 0 -14px}
+ .phone .hint{bottom:calc(56px + var(--sa-b))}
 </style>
 </head>
 <body>
@@ -389,7 +391,7 @@ video::cue{color:transparent;background:transparent;text-shadow:none}
    <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow"></video>
    <div class="spin" aria-hidden="true"></div>
    <div class="subs" id="subs" aria-live="polite"></div>
-   <button class="bigplay" id="bigplay" aria-label="Pause"><svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.2v13.6a1 1 0 0 0 1.5.86l11-6.8a1 1 0 0 0 0-1.72l-11-6.8A1 1 0 0 0 8 5.2z"/></svg><svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.4"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.4"/></svg></button>
+   <button class="bigplay" id="bigplay" aria-label="Pause"><svg class="ic-play" viewBox="0 0 24 24" fill="currentColor"><path d="M6.5 5.1v13.8a1 1 0 0 0 1.52.85l11.1-6.9a1 1 0 0 0 0-1.7L8.02 4.25A1 1 0 0 0 6.5 5.1z"/></svg><svg class="ic-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4.5" width="4.2" height="15" rx="1.4"/><rect x="13.8" y="4.5" width="4.2" height="15" rx="1.4"/></svg></button>
    <div class="volhud" id="volhud"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg><i><b id="volfill"></b></i><span id="volpct"></span></div>
    <div class="msg" id="msg"><h2 id="msgT">No signal</h2><p id="msgP">Pick a channel from the guide, or type a channel number.</p><div class="btns" id="msgB"></div></div>
    <div class="osd" id="osd"></div>
@@ -473,7 +475,10 @@ const TOUCH=matchMedia('(pointer: coarse)').matches||matchMedia('(any-pointer: c
 const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
 if(IOS)document.documentElement.classList.add('ios');
 const APPLE_WEB=IOS||(/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|Edg|Android/.test(navigator.userAgent));
-function updPhone(){const shortSide=Math.min(screen.width||innerWidth,screen.height||innerHeight);document.documentElement.classList.toggle('phone',TOUCH&&(shortSide<=540||innerWidth<=900||innerHeight<=540))}
+function updPhone(){const h=document.documentElement,shortSide=Math.min(screen.width||innerWidth,screen.height||innerHeight),ph=TOUCH&&(shortSide<=540||innerWidth<=900||innerHeight<=540);
+ h.classList.toggle('phone',ph);h.classList.toggle('rot',ph&&innerHeight>innerWidth)}
+// touch points in the app's own (possibly rotated) frame
+function tp(t){return document.documentElement.classList.contains('rot')?{x:t.clientY,y:-t.clientX}:{x:t.clientX,y:t.clientY}}
 addEventListener('orientationchange',()=>setTimeout(()=>dispatchEvent(new Event('resize')),250));
 updPhone();addEventListener('resize',updPhone);
 const PHONE=()=>document.documentElement.classList.contains('phone'),SMALL=()=>PHONE()||innerWidth<=900;
@@ -672,8 +677,12 @@ video.addEventListener('pause',()=>{$('bPlay').innerHTML=ICON.play;mediaState('p
 video.addEventListener('play',()=>$('screen').classList.remove('paused'));
 // centre play/pause: knows when a channel is really on screen, animates on every toggle
 video.addEventListener('playing',()=>$('screen').classList.add('live'));
-function bigPop(){const b=$('bigplay');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');b.setAttribute('aria-label',video.paused?'Play':'Pause')}
-video.addEventListener('pause',bigPop);video.addEventListener('play',bigPop);
+let flashT=null;
+function bigPop(){const b=$('bigplay');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');b.setAttribute('aria-label',video.paused?'Play':'Pause');
+ clearTimeout(flashT);if(video.paused)b.classList.remove('flash');else{b.classList.add('flash');flashT=setTimeout(()=>b.classList.remove('flash'),900)}}
+let userPaused=false;
+video.addEventListener('pause',()=>{userPaused=$('screen').classList.contains('live');bigPop()});
+video.addEventListener('play',()=>{if(userPaused){userPaused=false;bigPop()}});
 $('bigplay').addEventListener('animationend',e=>{if(e.animationName==='bpPop')$('bigplay').classList.remove('pop')});
 video.addEventListener('emptied',()=>$('screen').classList.remove('paused','live'));
 video.addEventListener('error',()=>{if(!hls&&cur&&video.getAttribute('src'))fail(tuneId,'stream unavailable')});
@@ -775,7 +784,11 @@ video.addEventListener('pause',()=>stage.classList.remove('idleui'));
 
 // fullscreen always keeps Open TV's own player (never hands off to the phone's built-in one)
 const fsEl=()=>document.fullscreenElement||document.webkitFullscreenElement;
-function setImmersive(on){$('app').classList.toggle('immersive',on);$('bFull').classList.toggle('on',on);if(on){closeGuide();closeSheet(true);stage.classList.add('idleui')}else wake()}
+let autoFS=false,fsSkipTap=false;
+document.addEventListener('touchend',()=>{if(!PHONE()||fsEl())return;const el=$('app'),req=el.requestFullscreen||el.webkitRequestFullscreen;if(!req||/iPhone|iPod/.test(navigator.userAgent))return;
+ autoFS=true;fsSkipTap=true;setTimeout(()=>{fsSkipTap=false;autoFS=false},600);
+ Promise.resolve(req.call(el,{navigationUI:'hide'})).then(()=>screen.orientation?.lock?.('landscape').catch(()=>{})).catch(()=>{fsSkipTap=false})},{capture:true});
+function setImmersive(on){$('app').classList.toggle('immersive',on);$('bFull').classList.toggle('on',on);if(on&&!autoFS){closeGuide();closeSheet(true);stage.classList.add('idleui')}else wake()}
 document.addEventListener('fullscreenchange',()=>setImmersive(!!fsEl()));document.addEventListener('webkitfullscreenchange',()=>setImmersive(!!fsEl()));
 $('bFull').onclick=()=>{
  if(fsEl()){(document.exitFullscreen||document.webkitExitFullscreen).call(document)?.catch?.(()=>{});return}
@@ -814,8 +827,8 @@ let bs=null;
 $('app').querySelector('.bar').addEventListener('touchstart',e=>{bs=e.touches[0].clientY},{passive:true});
 $('app').querySelector('.bar').addEventListener('touchend',e=>{if(bs==null||PHONE())return;const dy=e.changedTouches[0].clientY-bs;bs=null;if(dy<-28)openSheet();else if(dy>28)closeSheet()},{passive:true});
 let ss=null;
-$('info').addEventListener('touchstart',e=>{ss=$('info').scrollTop<=0?e.touches[0].clientY:null},{passive:true});
-$('info').addEventListener('touchend',e=>{if(ss==null)return;const dy=e.changedTouches[0].clientY-ss;ss=null;if(dy>60)closeSheet()},{passive:true});
+$('info').addEventListener('touchstart',e=>{ss=$('info').scrollTop<=0?tp(e.touches[0]).y:null},{passive:true});
+$('info').addEventListener('touchend',e=>{if(ss==null)return;const dy=tp(e.changedTouches[0]).y-ss;ss=null;if(dy>60)closeSheet()},{passive:true});
 const optMap={oSkip:'skip',oGeo:'geo',oNot247:'not247',oNsfw:'nsfw',oHttp:'http'};
 for(const [el,k] of Object.entries(optMap)){$(el).checked=opt[k];$(el).onchange=e=>{opt[k]=e.target.checked;store.set('opt',opt);applyFilters(true)}}
 $('bM3u').onclick=()=>{
@@ -947,17 +960,18 @@ function setVolume(v){v=Math.max(0,Math.min(1,v));
  $('vol').value=v;$('volfill').style.width=Math.round(v*100)+'%';$('volpct').textContent=Math.round(v*100)+'%';
  $('volhud').classList.add('show');clearTimeout(volHudT);volHudT=setTimeout(()=>$('volhud').classList.remove('show'),900)}
 const curVol=()=>casting()&&rp?rp.volumeLevel:(video.muted?0:video.volume);
-$('screen').addEventListener('touchstart',e=>{clearTimeout(holdT);if(e.touches.length!==1||e.target.closest('button')){ts=null;return}const t=e.touches[0];
- ts={x:t.clientX,y:t.clientY,lx:t.clientX,ly:t.clientY,t:Date.now(),mode:null};
+$('screen').addEventListener('touchstart',e=>{clearTimeout(holdT);if(e.touches.length!==1||e.target.closest('button')){ts=null;return}const t=tp(e.touches[0]);
+ ts={x:t.x,y:t.y,lx:t.x,ly:t.y,t:Date.now(),mode:null};
  holdT=setTimeout(()=>{if(!ts||Math.abs(ts.lx-ts.x)>10||Math.abs(ts.ly-ts.y)>10)return;
   if(IOS){toast('On iPhone, change the volume with the side buttons');ts.mode='none';return}
   ts.mode='vol';ts.v0=curVol();ts.x=ts.lx;ts.y=ts.ly;setVolume(ts.v0);navigator.vibrate?.(10)},380)},{passive:true});
-$('screen').addEventListener('touchmove',e=>{if(!ts)return;const t=e.touches[0];ts.lx=t.clientX;ts.ly=t.clientY;
+$('screen').addEventListener('touchmove',e=>{if(!ts)return;const t=tp(e.touches[0]);ts.lx=t.x;ts.ly=t.y;
  if(ts.mode==='vol'){e.preventDefault();const dy=ts.y-ts.ly,dx=ts.lx-ts.x,d=Math.abs(dy)>=Math.abs(dx)?dy:dx;setVolume(ts.v0+d/220)}},{passive:false});
 $('screen').addEventListener('touchcancel',()=>{clearTimeout(holdT);ts=null});
 $('screen').addEventListener('touchend',e=>{clearTimeout(holdT);
- if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t,mode=ts.mode;ts=null;
+ if(!ts||e.target.closest('button'))return;const t=tp(e.changedTouches[0]),dx=t.x-ts.x,dy=t.y-ts.y,dt=Date.now()-ts.t,mode=ts.mode;ts=null;
  if(mode){e.preventDefault();return}
+ if(fsSkipTap){fsSkipTap=false;return}
  const tap=Math.abs(dx)<12&&Math.abs(dy)<12&&dt<500,vert=dt<800&&Math.abs(dy)>45&&Math.abs(dy)>Math.abs(dx)*1.3,horiz=dt<800&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.3;
  if(popOpen()){if(tap){e.preventDefault();closePop()}return}
  if(stage.classList.contains('sheet')){if(tap||(horiz&&dx>0)){e.preventDefault();closeSheet()}return}
@@ -969,8 +983,8 @@ $('screen').addEventListener('touchend',e=>{clearTimeout(holdT);
 if(TOUCH){const h=document.createElement('div');h.className='hint';h.innerHTML='Tap to pause · hold and slide for volume<br>Swipe ↑ ↓ channels · → guide · ← details';$('screen').append(h);
  setTimeout(()=>{h.style.opacity=0;setTimeout(()=>h.remove(),500)},7000)}
 function swipeClose(el,dir,fn){let s0=null;
- el.addEventListener('touchstart',e=>{s0=e.touches.length===1&&!e.target.closest('.chips,input,select')?{x:e.touches[0].clientX,y:e.touches[0].clientY}:null},{passive:true});
- el.addEventListener('touchend',e=>{if(!s0)return;const dx=e.changedTouches[0].clientX-s0.x,dy=e.changedTouches[0].clientY-s0.y;s0=null;if(dx*dir>60&&Math.abs(dx)>Math.abs(dy)*1.3)fn()},{passive:true})}
+ el.addEventListener('touchstart',e=>{s0=e.touches.length===1&&!e.target.closest('.chips,input,select')?tp(e.touches[0]):null},{passive:true});
+ el.addEventListener('touchend',e=>{if(!s0)return;const q=tp(e.changedTouches[0]),dx=q.x-s0.x,dy=q.y-s0.y;s0=null;if(dx*dir>60&&Math.abs(dx)>Math.abs(dy)*1.3)fn()},{passive:true})}
 swipeClose(document.querySelector('.guide'),-1,()=>{if(SMALL())closeGuide()});
 swipeClose($('info'),1,()=>{if(PHONE())closeSheet()});
 
