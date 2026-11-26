@@ -243,11 +243,23 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",sys
 }
 /* phones: no guide/arrow/help buttons (swipe instead), volume bar shown, details slide in from the right */
 .phone #bGuide,.phone #bSheet,.phone #bHelp,.phone .bar select{display:none!important}
-.phone .vol input{display:block;flex:1 1 auto;width:auto;min-width:48px}
-.phone .app.ov .bar .vol{flex:2.4 1 0;display:flex;align-items:center;gap:2px;padding-right:6px}
-.phone .app.ov .bar .vol .cbtn{width:auto;flex:none}
 .phone .app.ov .bar .cbtn{min-width:38px;padding:0 6px}
-.phone .app.ov .info{left:auto;right:calc(10px + env(safe-area-inset-right));top:calc(10px + env(safe-area-inset-top));bottom:calc(72px + env(safe-area-inset-bottom));
+/* phones: iPhone-player layout. Top-left: fullscreen + picture-in-picture. Top-right: AirPlay/cast + volume. Bottom: the rest. */
+.tbar{display:none}
+.phone .tbar{display:flex;align-items:center;gap:2px;position:absolute;z-index:4;top:calc(10px + env(safe-area-inset-top));padding:3px;border-radius:24px;
+ background:rgba(44,44,50,.34);-webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);border:1px solid rgba(255,255,255,.16);box-shadow:0 10px 34px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.14);transition:opacity .35s,transform .35s}
+.phone .tbar:empty{display:none}
+#tbarL{left:calc(10px + env(safe-area-inset-left))}
+#tbarR{right:calc(10px + env(safe-area-inset-right))}
+.tbar .cbtn{background:transparent;color:#fff;border-radius:20px;min-width:40px;height:40px;padding:0 8px}
+.tbar .vol{display:flex;align-items:center;gap:2px;padding-right:10px}
+.phone .tbar .vol input{display:block;flex:none;width:clamp(70px,26vw,120px)}
+.app.ov.noguide .stage.idleui:not(.sheet) .tbar{opacity:0;transform:translateY(-16px);pointer-events:none}
+.phone .osd{top:calc(66px + env(safe-area-inset-top))}
+.phone .entry{top:calc(66px + env(safe-area-inset-top))}
+.phone .toast{top:calc(64px + env(safe-area-inset-top))}
+.phone .hint{top:calc(112px + env(safe-area-inset-top))}
+.phone .app.ov .info{left:auto;right:calc(10px + env(safe-area-inset-right));top:calc(62px + env(safe-area-inset-top));bottom:calc(72px + env(safe-area-inset-bottom));
  width:min(390px,calc(100% - 20px));max-height:none;grid-template-columns:1fr;transform:translateX(calc(100% + 30px))}
 .phone .app.ov .stage.sheet .info{transform:none}
 .phone .app.ov .info::before{display:none}
@@ -301,6 +313,7 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",sys
    <div class="pop" id="ccPop" role="dialog" aria-label="Captions"><h3>Captions</h3><div id="ccList"></div><div class="qsec" id="qSec"><h3>Quality</h3><div id="qList"></div></div></div>
    <div class="banner" id="banner"></div>
   </div>
+  <div class="tbar" id="tbarL"></div><div class="tbar" id="tbarR"></div>
   <div class="bar">
    <button class="cbtn" id="bPlay" title="Play / pause (Space)" aria-label="Play or pause"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5.5" y="4" width="4.5" height="16" rx="1.4"/><rect x="14" y="4" width="4.5" height="16" rx="1.4"/></svg></button>
    <div class="vol"><button class="cbtn" id="bMute" title="Mute (M)" aria-label="Mute"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path d="M15.5 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg></button><input type="range" id="vol" min="0" max="1" step="0.05" aria-label="Volume"></div>
@@ -663,7 +676,7 @@ const stage=document.querySelector('.stage');let idleT;
 function wake(e){
  if(e&&TOUCH&&(e.type==='mousemove'||(e.type==='touchstart'&&e.target.closest&&e.target.closest('#screen'))))return; // on phones, taps on the video decide
  stage.classList.remove('idleui');clearTimeout(idleT);
- if(e&&e.target.closest&&e.target.closest('.bar,.info'))return;
+ if(e&&e.target.closest&&e.target.closest('.bar,.tbar,.info'))return;
  if(stage.classList.contains('sheet'))return;
  idleT=setTimeout(()=>{if(!video.paused)stage.classList.add('idleui')},TOUCH?4000:2800)}
 ['mousemove','touchstart','keydown'].forEach(ev=>stage.addEventListener(ev,wake,{passive:true}));document.addEventListener('keydown',wake);
@@ -845,6 +858,13 @@ $('ccPop').addEventListener('click',e=>{e.stopPropagation();const c=e.target.clo
 document.addEventListener('click',e=>{if(!e.target.closest('#ccPop,#bCC'))closePop()});
 renderCC();
 if(video.webkitShowPlaybackTargetPicker&&!/Chrome|CriOS|Android/.test(navigator.userAgent)){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title='AirPlay';$('bCast').setAttribute('aria-label','AirPlay')}
+
+// phones: move fullscreen + PiP to the top-left and cast + volume to the top-right, like the iPhone player
+const barEl=document.querySelector('.bar');
+const slots=[['bFull','tbarL'],['bPip','tbarL'],['bCast','tbarR']].map(([a,b])=>[$(a),$(b)]).concat([[barEl.querySelector('.vol'),$('tbarR')]])
+ .map(([el,dest])=>{const m=document.createComment('slot');el.before(m);return {el,dest,m}});
+function placeControls(){const ph=PHONE();for(const {el,dest,m} of slots){if(ph){if(el.parentNode!==dest)dest.append(el)}else if(el.parentNode!==barEl)m.after(el)}}
+placeControls();addEventListener('resize',placeControls);
 
 // phones: start with the guide closed if there's a channel to resume, open otherwise
 setGuide(SMALL()?!store.get('lastCh',''):!store.get('noguide',false),false);
