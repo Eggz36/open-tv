@@ -425,7 +425,7 @@ let ALL=[],VIEW=[],byId=new Map(),countries=new Map(),cats=new Map(),langs=new M
 let favs=new Set(store.get('favs',[])),recents=store.get('recents',[]);
 const opt=Object.assign({skip:true,geo:false,not247:false,nsfw:false,http:location.protocol==='https:'},store.get('opt',{}));
 const NATIVE=!!document.createElement('video').canPlayType('application/vnd.apple.mpegurl')&&/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)&&!/Chrome|Android/.test(navigator.userAgent);
-const TOUCH=matchMedia('(pointer: coarse)').matches;if(TOUCH)document.documentElement.classList.add('touch');
+const TOUCH=matchMedia('(pointer: coarse)').matches||matchMedia('(any-pointer: coarse)').matches&&matchMedia('(hover: none)').matches||(navigator.maxTouchPoints>0&&/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent));if(TOUCH)document.documentElement.classList.add('touch');
 const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1);
 if(IOS)document.documentElement.classList.add('ios');
 const APPLE_WEB=IOS||(/Safari/.test(navigator.userAgent)&&!/Chrome|Chromium|Edg|Android/.test(navigator.userAgent));
