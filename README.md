@@ -12,20 +12,23 @@ Open TV is a free live TV app for iPhone, Android and PC. It runs from GitHub Pa
 
 ## Controls
 
-| Action | Touch | Mouse / keyboard |
+| Action | Phone | PC (mouse / keyboard) |
 |---|---|---|
 | Show / hide the controls | Tap the video | Move the mouse |
-| Next / previous channel | Swipe up / down on the video (controls hidden) | ↓ / ↑, PgDn / PgUp, or the TV remote's CH+/CH− |
-| Back to last channel | Swipe sideways | Backspace |
-| Show channel details | Tap the video, then swipe up | Scroll up over the video, or click ⌃ |
-| Hide details again | Swipe down, or tap the video | Scroll down, or press Esc |
+| Next / previous channel | Swipe up / down | ↓ / ↑, PgDn / PgUp, or the TV remote's CH+/CH− |
+| Open the channel guide | Swipe right | Guide button or G |
+| Open the channel details | Swipe left (slides in from the right) | Scroll up over the video, or click ⌃ |
+| Close a panel | Swipe it back, or tap the video | Scroll down, or press Esc |
+| Back to last channel | – | Backspace |
+| Captions | CC button | CC button |
 | Type a channel number | – | 0–9, then Enter |
 | Try another stream source | – | → |
 
-The video always fills the screen. The controls float over it as a frosted bar with play/pause, sound, favorite, cast, picture-in-picture, fullscreen, guide, details (⌃) and help.
+The video always fills the screen. The controls float over it as a frosted bar: play/pause, sound and volume, favorite, cast / AirPlay, captions, picture-in-picture and fullscreen. On PC it's a floating island that also has guide, details (⌃) and help; on phones it spans the full width and you use swipes for the guide and details.
 
 - **Guide button:** slides the channel list in or out as a frosted panel over the video. On a phone, it closes by itself after you pick a channel.
-- **⌃ button (PC):** slides the channel details up over the picture. Phones don't need it: tap the video, then swipe up.
+- **CC button:** turns captions on or off when the channel sends them, and remembers your choice. On phones the stream quality is in this menu too.
+- **Volume on iPhone:** Apple only lets the side buttons change loudness, so the volume bar there mutes at zero and unmutes otherwise.
 - **Fullscreen:** stays in Open TV's own player on every device. On iPhone it hides everything but the video; add the app to your Home Screen to hide Safari's bars too.
 
 ## Casting to a TV
