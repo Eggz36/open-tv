@@ -13,7 +13,7 @@
 <link rel="icon" type="image/png" href="icon-192.png">
 <title>Open TV</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=VT323&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.17/dist/hls.min.js"></script>
 <script>
 if(/Chrome|Edg\//.test(navigator.userAgent)&&!/CriOS|EdgiOS|iPhone|iPad/.test(navigator.userAgent)&&location.protocol==='https:'){const c=document.createElement('script');c.src='https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1';c.async=true;document.head.appendChild(c)}
@@ -23,7 +23,7 @@ if(/Chrome|Edg\//.test(navigator.userAgent)&&!/CriOS|EdgiOS|iPhone|iPad/.test(na
 VOICE: late-night living room, a cable box that just works
 IDEA: the on-screen guide + remote of a set-top box
 PICTURE: the live picture itself, with static between channels and a big phosphor channel number
-COLOUR/TYPE: charcoal glass, white text, one signal-red accent; Space Grotesk + VT323 for the OSD digits
+COLOUR/TYPE: charcoal glass, white text, one signal-red accent; Space Grotesk throughout
 LAYOUT: guide column left, screen + controls + channel card right; stacks on phones
 */
 :root{--bg:#0d0d10;--panel:#16161b;--panel2:#1e1e25;--line:#2a2a33;--ink:#f2f1ee;--dim:#9a99a3;--acc:#ff3b30;--ok:#34c759;--warn:#ffb020;color-scheme:dark}
@@ -113,7 +113,7 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .row{position:absolute;left:0;right:0;height:62px;display:grid;grid-template-columns:52px 58px minmax(0,1fr) auto;align-items:center;gap:10px;padding:0 12px 0 8px;cursor:pointer;border-bottom:1px solid #1c1c22}
 .row:hover{background:var(--panel2)}
 .row.cur{background:#2a1716;box-shadow:inset 3px 0 0 var(--acc)}
-.num{font:22px/1 VT323,monospace;color:var(--dim);text-align:right}
+.num{font:600 15px/1 "Space Grotesk",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:var(--dim);text-align:right}
 .row.cur .num{color:var(--acc)}
 .logo{width:58px;height:40px;border-radius:7px;background:#24242c;display:grid;place-items:center;overflow:hidden;font-weight:700;font-size:13px;color:var(--dim)}
 .logo img{max-width:88%;max-height:84%;object-fit:contain}
@@ -125,28 +125,32 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .stage{display:flex;flex-direction:column;min-height:0}
 .screen{position:relative;background:#000;aspect-ratio:16/9;max-height:calc(100dvh - 150px);touch-action:pan-x pinch-zoom;-webkit-user-select:none;user-select:none;width:100%;overflow:hidden}
 .screen video{position:absolute;inset:0;width:100%;height:100%;background:#000}
-.screen canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;opacity:0;transition:opacity .25s}
-.screen.tuning canvas,.screen.nosig canvas,.screen.idle canvas{opacity:1}
-.osd{position:absolute;top:calc(18px + env(safe-area-inset-top));right:24px;text-align:right;font:clamp(44px,7vw,92px)/.9 VT323,monospace;color:#c8ffd0;text-shadow:0 0 12px rgba(120,255,150,.55),2px 2px 0 #000;pointer-events:none;opacity:0;transition:opacity .3s}
-.osd small{display:block;font-size:.38em;color:#fff;text-shadow:2px 2px 0 #000}
+.screen{background:#0b0b0e}
+.screen.tuning video,.screen.nosig video,.screen.idle video{opacity:0}
+.spin{position:absolute;left:50%;top:50%;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;border:3.5px solid rgba(255,255,255,.18);border-top-color:#fff;animation:spin .8s linear infinite;opacity:0;pointer-events:none;transition:opacity .2s}
+.screen.tuning .spin,.screen.buffering .spin{opacity:1}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading .spin{position:static;margin:0 auto;opacity:1}
+.osd{position:absolute;top:calc(18px + env(safe-area-inset-top));right:24px;text-align:right;font:700 clamp(34px,5vw,58px)/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);pointer-events:none;opacity:0;transition:opacity .3s}
+.osd small{display:block;margin-top:4px;font-size:.36em;font-weight:500;letter-spacing:0;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.65)}
 .osd.show{opacity:1}
 .msg{position:absolute;inset:0;display:none;place-content:center;text-align:center;gap:12px;padding:20px}
 .screen.nosig .msg,.screen.idle .msg{display:grid}
-.msg h2{margin:0;font:clamp(36px,6vw,72px)/1 VT323,monospace;background:rgba(0,0,0,.72);padding:6px 18px;justify-self:center}
-.msg p{margin:0;background:rgba(0,0,0,.72);padding:6px 12px;justify-self:center;max-width:520px;color:#ddd}
+.msg h2{margin:0;font:700 clamp(24px,4vw,34px)/1.1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.01em;justify-self:center}
+.msg p{margin:0;justify-self:center;max-width:480px;color:rgba(255,255,255,.72)}
 .msg .btns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
 .pill{display:inline-flex;align-items:center;justify-content:center;text-align:center;height:40px;padding:0 16px;border-radius:20px;border:1px solid rgba(255,255,255,.25);background:rgba(20,20,24,.85);font-weight:500}
 .pill.red{background:var(--acc);border-color:var(--acc);color:#fff}
 .banner{position:absolute;left:0;right:0;bottom:0;padding:40px 22px 16px;background:linear-gradient(transparent,rgba(0,0,0,.88));display:flex;gap:14px;align-items:center;opacity:0;transition:opacity .35s;pointer-events:none}
 .banner.show{opacity:1}
 .banner .logo{width:86px;height:58px;background:rgba(255,255,255,.08)}
-.banner .bn{font:30px/1 VT323,monospace;color:#c8ffd0}
+.banner .bn{font:700 20px/1 "Space Grotesk",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:rgba(255,255,255,.7)}
 .banner .bt{font-size:clamp(17px,2.2vw,24px);font-weight:600;line-height:1.15}
 .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px}
 .tag{font-size:12px;padding:2px 8px;border-radius:5px;background:rgba(255,255,255,.12);color:#ddd;white-space:nowrap}
 .tag.live{background:var(--acc);color:#fff;font-weight:700}
 .tag.w{background:rgba(255,176,32,.2);color:var(--warn)}
-.entry{position:absolute;left:24px;top:calc(18px + env(safe-area-inset-top));font:44px/1 VT323,monospace;color:#c8ffd0;text-shadow:0 0 10px rgba(120,255,150,.6),2px 2px 0 #000;display:none}
+.entry{position:absolute;left:24px;top:calc(18px + env(safe-area-inset-top));font:700 40px/1 "Space Grotesk",system-ui,sans-serif;font-variant-numeric:tabular-nums;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.65);display:none}
 .entry.show{display:block}
 .toast{position:absolute;z-index:7;left:50%;top:calc(18px + env(safe-area-inset-top));transform:translateX(-50%);background:rgba(0,0,0,.8);padding:7px 14px;border-radius:8px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 .toast.show{opacity:1}
@@ -157,7 +161,6 @@ select{height:38px;border-radius:9px;border:1px solid var(--line);background:var
 .cbtn.on{background:rgba(255,255,255,.18)}
 #bFav.on{color:var(--warn)}
 .cbtn[hidden]{display:none}
-.cbtn.chan{font:24px/1 VT323,monospace;min-width:auto}
 .vol{display:flex;align-items:center;gap:6px}
 input[type=range]{accent-color:var(--acc);width:100px}
 .sp{flex:1}
@@ -177,9 +180,7 @@ h3{margin:0 0 8px;font-size:13px;color:var(--dim);font-weight:500}
 .src .dot{width:8px;height:8px;border-radius:50%;background:#555;display:inline-block;margin-right:6px}
 .src .dot.ok{background:var(--ok)}.src .dot.bad{background:var(--acc)}
 .loading{position:fixed;inset:0;background:var(--bg);display:grid;place-content:center;text-align:center;gap:14px;z-index:9}
-.loading h2{margin:0;font:64px/1 VT323,monospace;color:#c8ffd0;text-shadow:0 0 14px rgba(120,255,150,.5)}
-.prog{width:280px;height:6px;border-radius:3px;background:var(--line);overflow:hidden;justify-self:center}
-.prog i{display:block;height:100%;width:0;background:var(--acc);transition:width .3s}
+.loading h2{margin:0;font:700 30px/1 "Space Grotesk",system-ui,sans-serif;letter-spacing:-.02em;color:#fff}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;place-items:center;z-index:8;padding:16px}
 .modal.show{display:grid}
 .modal .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;max-width:440px;width:100%}
@@ -210,8 +211,8 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
  .app.ov .info{bottom:calc(68px + env(safe-area-inset-bottom));max-height:min(64%,560px)}
  .app.ov .banner{padding-bottom:calc(74px + env(safe-area-inset-bottom))}
  .guide{bottom:calc(72px + env(safe-area-inset-bottom))}
- .osd{font-size:clamp(40px,12vw,64px)}
- .msg h2{font-size:clamp(34px,11vw,56px)}
+ .osd{font-size:clamp(30px,9vw,44px)}
+ .msg h2{font-size:clamp(22px,6vw,28px)}
  .msg p{font-size:14px}
 }
 @media(max-height:500px) and (orientation:landscape){
@@ -229,9 +230,8 @@ kbd{font:13px ui-monospace,monospace;background:var(--panel2);border:1px solid v
 .pop .opt:hover{background:rgba(255,255,255,.1)}
 .pop .opt.sel::after{content:"✓";color:var(--ok);font-weight:700}
 .pop .none{padding:6px 12px 10px;font-size:13px;color:rgba(255,255,255,.6)}
-.pop .qsec{display:none;margin-top:8px;border-top:1px solid rgba(255,255,255,.12);padding-top:8px}
-.phone .pop .qsec{display:block}
-#bCC.empty{opacity:.45}
+#quality{display:none!important}
+#bCC.empty,#bQ.empty{opacity:.45}
 video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",system-ui,sans-serif}
 /* phones (portrait or landscape): controls stretch across the whole width; PC keeps the floating island */
 @media(max-width:900px),(pointer:coarse) and (max-height:500px){
@@ -268,13 +268,13 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",sys
 .install{display:none}.can-install .install{display:inline-flex;align-items:center;justify-content:center;text-align:center;line-height:1}
 .touch .row:hover{background:transparent}
 .hint{position:absolute;left:50%;top:calc(70px + env(safe-area-inset-top));transform:translateX(-50%);font-size:13px;color:#fff;background:rgba(30,30,36,.6);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);padding:8px 14px;border-radius:14px;pointer-events:none;text-align:center;line-height:1.4;width:max-content;max-width:calc(100% - 32px);transition:opacity .4s}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.spin{animation-duration:1.6s}}
 </style>
 </head>
 <body>
 <div class="loading" id="loading">
- <h2>OPEN TV</h2>
- <div class="prog"><i id="progbar"></i></div>
+ <div class="spin"></div>
+ <h2>Open TV</h2>
  <div id="loadmsg" style="color:var(--dim)">Downloading the iptv-org channel database…</div>
 </div>
 
@@ -305,12 +305,13 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",sys
  <main class="stage">
   <div class="screen idle" id="screen">
    <video id="video" playsinline webkit-playsinline x-webkit-airplay="allow" disableremoteplayback></video>
-   <canvas id="noise" width="160" height="90"></canvas>
-   <div class="msg" id="msg"><h2 id="msgT">NO SIGNAL</h2><p id="msgP">Pick a channel from the guide, or type a channel number.</p><div class="btns" id="msgB"></div></div>
+   <div class="spin" aria-hidden="true"></div>
+   <div class="msg" id="msg"><h2 id="msgT">No signal</h2><p id="msgP">Pick a channel from the guide, or type a channel number.</p><div class="btns" id="msgB"></div></div>
    <div class="osd" id="osd"></div>
    <div class="entry" id="entry"></div>
    <div class="toast" id="toast"></div>
-   <div class="pop" id="ccPop" role="dialog" aria-label="Captions"><h3>Captions</h3><div id="ccList"></div><div class="qsec" id="qSec"><h3>Quality</h3><div id="qList"></div></div></div>
+   <div class="pop" id="ccPop" role="dialog" aria-label="Captions"><h3>Captions</h3><div id="ccList"></div></div>
+   <div class="pop" id="qPop" role="dialog" aria-label="Quality"><h3>Quality</h3><div id="qList"></div></div>
    <div class="banner" id="banner"></div>
   </div>
   <div class="tbar" id="tbarL"></div><div class="tbar" id="tbarR"></div>
@@ -321,6 +322,7 @@ video::cue{background:rgba(0,0,0,.65);color:#fff;font-family:"Space Grotesk",sys
    <select id="quality" aria-label="Quality" title="Quality"><option value="-1">Auto</option></select>
    <button class="cbtn" id="bFav" title="Favorite (S)" aria-label="Favorite"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="m12 3.5 2.6 5.3 5.9.86-4.25 4.14 1 5.86L12 16.9l-5.25 2.76 1-5.86L3.5 9.66l5.9-.86z"/></svg></button>
    <button class="cbtn" id="bCast" title="Cast to TV" aria-label="Cast to TV" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 8V6.5A2.5 2.5 0 0 1 5.5 4h13A2.5 2.5 0 0 1 21 6.5v11a2.5 2.5 0 0 1-2.5 2.5H14"/><path d="M3 12a8 8 0 0 1 8 8M3 16a4 4 0 0 1 4 4"/><circle cx="3.5" cy="19.5" r="1" fill="currentColor"/></svg></button>
+   <button class="cbtn empty" id="bQ" title="Quality" aria-label="Quality"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2.2"/><circle cx="9" cy="17" r="2.2"/></svg></button>
    <button class="cbtn empty" id="bCC" title="Captions" aria-label="Captions"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M10.5 10.2a2.4 2.4 0 1 0 0 3.6M17 10.2a2.4 2.4 0 1 0 0 3.6" stroke-linecap="round"/></svg></button>
    <button class="cbtn" id="bPip" title="Picture in picture" aria-label="Picture in picture"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2.5"/><rect x="12" y="11.5" width="6.5" height="5" rx="1" fill="currentColor"/></svg></button>
    <button class="cbtn" id="bFull" title="Fullscreen (F)" aria-label="Fullscreen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
@@ -397,7 +399,7 @@ const ICON={"play": "<svg viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"
 const files=['streams','channels','logos','countries','categories','languages','feeds','blocklist'];
 async function load(){
  let done=0;
- const get=async n=>{const r=await fetch(API+n+'.json',{cache:'default'});if(!r.ok)throw new Error(n+' '+r.status);const j=await r.json();done++;$('progbar').style.width=(done/files.length*100)+'%';$('loadmsg').textContent=`Loaded ${n} (${done}/${files.length})`;return j};
+ const get=async n=>{const r=await fetch(API+n+'.json',{cache:'default'});if(!r.ok)throw new Error(n+' '+r.status);const j=await r.json();done++;$('loadmsg').textContent=`Loaded ${n} (${done}/${files.length})`;return j};
  const [streams,channels,logos,ctry,categories,languages,feeds,block]=await Promise.all(files.map(get));
  const chMap=new Map(channels.map(c=>[c.id,c]));
  const blocked=new Set(block.map(b=>b.channel));
@@ -494,17 +496,8 @@ function scrollToCur(){
  renderList();
 }
 
-// ---------- static noise ----------
-const cv=$('noise'),cx=cv.getContext('2d'),img=cx.createImageData(160,90);
-const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-function noise(){
- const d=img.data;for(let i=0;i<d.length;i+=4){const v=Math.random()*255|0;d[i]=d[i+1]=d[i+2]=v;d[i+3]=255}
- cx.putImageData(img,0,0);
- const sc=$('screen').classList;
- if(!reduce&&(sc.contains('tuning')||sc.contains('nosig')||sc.contains('idle')))requestAnimationFrame(noise);else noiseOn=false;
-}
-let noiseOn=false;
-function setScreen(state){const s=$('screen');s.classList.remove('tuning','nosig','idle','cast');if(state==='cast'){s.classList.add('cast');return}if(state)s.classList.add(state);if(state&&!noiseOn){noiseOn=true;noise()}}
+// ---------- screen states: dark screen + spinner while tuning or buffering ----------
+function setScreen(state){const s=$('screen');s.classList.remove('tuning','nosig','idle','cast','buffering');if(state)s.classList.add(state)}
 
 // ---------- OSD / banner ----------
 let osdT,banT,toastT;
@@ -567,13 +560,13 @@ function playSource(){
  if(casting()){tuneId++;banner();renderSources();castLoad();return}
  const id=++tuneId,g=cur,s=g.sources[curSrc];
  stopPlayer();setScreen('tuning');banner();renderSources();
- $('quality').innerHTML='<option value="-1">Auto</option>';
+ $('quality').innerHTML='<option value="-1">Auto</option>';renderQ();
  const isHls=/m3u8/i.test(s.url)||!/\.(mp4|webm|ogg|mp3|aac)(\?|$)/i.test(s.url);
  $('quality').hidden=!!(NATIVE||!isHls);
  if(isHls&&!NATIVE&&window.Hls&&Hls.isSupported()){
   hls=new Hls({enableWorker:true,lowLatencyMode:true,manifestLoadingTimeOut:12000,manifestLoadingMaxRetry:1,levelLoadingMaxRetry:2,fragLoadingMaxRetry:3});
   hls.on(Hls.Events.MANIFEST_PARSED,(e,d)=>{if(id!==tuneId)return;
-   $('quality').innerHTML='<option value="-1">Auto</option>'+d.levels.map((l,i)=>`<option value="${i}">${l.height?l.height+'p':Math.round((l.bitrate||0)/1000)+' kbps'}</option>`).join('');renderCC();
+   $('quality').innerHTML='<option value="-1">Auto</option>'+d.levels.map((l,i)=>`<option value="${i}">${l.height?l.height+'p':Math.round((l.bitrate||0)/1000)+' kbps'}</option>`).join('');renderCC();renderQ();
    startPlay(id)});
   hls.on(Hls.Events.ERROR,(e,d)=>{if(id!==tuneId||!d.fatal)return;
    if(d.type===Hls.ErrorTypes.MEDIA_ERROR&&!hls._rec){hls._rec=1;hls.recoverMediaError();return}
@@ -589,7 +582,8 @@ function startPlay(id){
 video.addEventListener('playing',()=>{clearTimeout(tuneTimer);if(!cur)return;srcState.set(cur.sources[curSrc].url,'ok');saveHealth(cur.sources[curSrc].url,1);setScreen(null);renderSources();banner();$('bPlay').innerHTML=ICON.pause;mediaState('playing')});
 video.addEventListener('pause',()=>{$('bPlay').innerHTML=ICON.play;mediaState('paused')});
 video.addEventListener('error',()=>{if(!hls&&cur&&video.getAttribute('src'))fail(tuneId,'stream unavailable')});
-video.addEventListener('waiting',()=>{});
+video.addEventListener('waiting',()=>{const s=$('screen');if(cur&&!s.classList.contains('tuning')&&!s.classList.contains('nosig'))s.classList.add('buffering')});
+['playing','canplay','pause'].forEach(ev=>video.addEventListener(ev,()=>$('screen').classList.remove('buffering')));
 function fail(id,why){
  if(id!==tuneId)return;
  clearTimeout(tuneTimer);
@@ -597,7 +591,7 @@ function fail(id,why){
  const nx=(g.order||rankBase(g)).find(i=>!tried.has(i));
  if(nx!=null){curSrc=nx;toast(`Source failed (${why}) — trying backup ${tried.size+1}/${g.sources.length}`);playSource();return}
  stopPlayer();setScreen('nosig');renderSources();
- $('msgT').textContent='NO SIGNAL';
+ $('msgT').textContent='No signal';
  const s=g.sources[0];
  $('msgP').textContent=`${g.name} isn't reachable from your browser right now (${why}). ${g.geo?'It is marked geo-blocked. ':''}${g.sources.some(x=>x.hdr)?'Some sources need special headers a browser can’t send. ':''}Copy the stream URL to open it in VLC, or keep surfing.`;
  $('msgB').innerHTML='<button class="pill" data-a="retry">Retry</button><button class="pill" data-a="copy">Copy stream URL</button><button class="pill red" data-a="next">Next channel ▼</button>';
@@ -749,7 +743,7 @@ document.addEventListener('keydown',e=>{
   ' ':()=>$('bPlay').click(),m:()=>$('bMute').click(),s:toggleFav,r:random,f:()=>$('bFull').click(),g:()=>$('bGuide').click(),i:banner,
   '/':()=>$('q').focus(),'?':()=>openM('mHelp'),'+':()=>{video.volume=Math.min(1,video.volume+.1);video.muted=false;updateMute();toast('Volume '+Math.round(video.volume*100))},
   '=':()=>map['+'](),'-':()=>{video.volume=Math.max(0,video.volume-.1);updateMute();toast('Volume '+Math.round(video.volume*100))},
-  Escape:()=>{if($('ccPop').classList.contains('show')){closePop();return}if(document.querySelector('.modal.show')||stage.classList.contains('sheet'))popLayer()},
+  Escape:()=>{if(popOpen()){closePop();return}if(document.querySelector('.modal.show')||stage.classList.contains('sheet'))popLayer()},
   ChannelUp:()=>step(-1),ChannelDown:()=>step(1),MediaTrackNext:()=>step(1),MediaTrackPrevious:()=>step(-1),
   MediaPlayPause:()=>$('bPlay').click(),MediaPlay:()=>video.play().catch(()=>{}),MediaPause:()=>video.pause(),AudioVolumeMute:()=>$('bMute').click()};
  const fn=map[k]||map[k.toLowerCase()];
@@ -791,7 +785,7 @@ function castLoad(){
  md.images=[new chrome.cast.Image(g.logo||new URL('icon-512.png',location.href).href)];mi.metadata=md;
  const req=new chrome.cast.media.LoadRequest(mi);req.autoplay=true;
  stopPlayer();setScreen('cast');
- $('msgT').textContent='CASTING';$('msgP').textContent=`${g.name} is playing on ${castName}. Swipe or use the guide to change channels on the TV.`;
+ $('msgT').textContent='Casting';$('msgP').textContent=`${g.name} is playing on ${castName}. Swipe or use the guide to change channels on the TV.`;
  $('msgB').innerHTML='<button class="pill" data-a="castsrc">Try another source</button><button class="pill red" data-a="caststop">Stop casting</button>';
  sess.loadMedia(req).then(()=>toast('Casting '+g.name),()=>{toast('Your TV couldn’t play this stream');$('msgP').textContent=`${castName} couldn’t play this source of ${g.name}. Try another source or channel.`});
 }
@@ -822,7 +816,7 @@ $('screen').addEventListener('touchstart',e=>{if(e.touches.length!==1){ts=null;r
 $('screen').addEventListener('touchend',e=>{
  if(!ts||e.target.closest('button'))return;const t=e.changedTouches[0],dx=t.clientX-ts.x,dy=t.clientY-ts.y,dt=Date.now()-ts.t,vis=ts.vis;ts=null;
  const tap=Math.abs(dx)<12&&Math.abs(dy)<12,vert=dt<800&&Math.abs(dy)>45&&Math.abs(dy)>Math.abs(dx)*1.3,horiz=dt<800&&Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.3;
- if($('ccPop').classList.contains('show')){if(tap){e.preventDefault();closePop()}return}
+ if(popOpen()){if(tap){e.preventDefault();closePop()}return}
  if(stage.classList.contains('sheet')){if(tap||(horiz&&dx>0)){e.preventDefault();closeSheet()}return}
  if(!$('app').classList.contains('noguide')&&SMALL()){if(tap||(horiz&&dx<0)){e.preventDefault();closeGuide()}return}
  if(tap){e.preventDefault();if(vis&&cur){clearTimeout(idleT);stage.classList.add('idleui')}else{wake();if(cur)banner()}return}
@@ -837,7 +831,7 @@ function swipeClose(el,dir,fn){let s0=null;
 swipeClose(document.querySelector('.guide'),-1,()=>{if(SMALL())closeGuide()});
 swipeClose($('info'),1,()=>{if(PHONE())closeSheet()});
 
-// ---------- captions (and quality on phones) ----------
+// ---------- captions and quality menus ----------
 let ccPref=store.get('cc',false);
 const ccTracks=()=>[...(video.textTracks||[])].filter(t=>t.kind==='captions'||t.kind==='subtitles');
 function setCC(i){ccTracks().forEach((t,j)=>t.mode=j===i?'showing':'disabled');if(hls)hls.subtitleDisplay=i>=0;ccPref=i>=0;store.set('cc',ccPref);renderCC()}
@@ -845,18 +839,24 @@ function renderCC(){
  const ts=ccTracks(),on=ts.findIndex(t=>t.mode==='showing');
  $('bCC').classList.toggle('on',on>=0);$('bCC').classList.toggle('empty',!ts.length);
  $('ccList').innerHTML=`<button class="opt${on<0?' sel':''}" data-cc="-1">Off</button>`+ts.map((t,j)=>`<button class="opt${on===j?' sel':''}" data-cc="${j}">${esc(t.label||(t.language&&langs.get(t.language)?.name)||t.language||('Captions '+(j+1)))}</button>`).join('')+(ts.length?'':'<div class="none">This channel doesn’t send captions.</div>');
+}
+function renderQ(){
  const lv=hls&&hls.levels?hls.levels:[];
+ $('bQ').classList.toggle('empty',lv.length<2);
  $('qList').innerHTML=lv.length>1?`<button class="opt${hls.autoLevelEnabled?' sel':''}" data-q="-1">Auto</button>`+lv.map((l,i)=>`<button class="opt${!hls.autoLevelEnabled&&hls.currentLevel===i?' sel':''}" data-q="${i}">${l.height?l.height+'p':Math.round((l.bitrate||0)/1000)+' kbps'}</button>`).join(''):'<div class="none">Only one quality for this channel.</div>';
 }
 if(video.textTracks&&video.textTracks.addEventListener)['addtrack','removetrack','change'].forEach(ev=>video.textTracks.addEventListener(ev,()=>{
  if(ev==='addtrack'&&ccPref){const ts=ccTracks();if(ts.length&&!ts.some(t=>t.mode==='showing'))ts[0].mode='showing'}renderCC()}));
-function closePop(){$('ccPop').classList.remove('show')}
-$('bCC').onclick=e=>{e.stopPropagation();renderCC();$('ccPop').classList.toggle('show');wake()};
-$('ccPop').addEventListener('click',e=>{e.stopPropagation();const c=e.target.closest('[data-cc]'),q=e.target.closest('[data-q]');
- if(c){setCC(+c.dataset.cc);setTimeout(closePop,150)}
- if(q&&hls){hls.currentLevel=+q.dataset.q;$('quality').value=q.dataset.q;renderCC();toast('Quality: '+q.textContent);setTimeout(closePop,150)}});
-document.addEventListener('click',e=>{if(!e.target.closest('#ccPop,#bCC'))closePop()});
-renderCC();
+const popOpen=()=>$('ccPop').classList.contains('show')||$('qPop').classList.contains('show');
+function closePop(){$('ccPop').classList.remove('show');$('qPop').classList.remove('show')}
+function togglePop(id){const open=!$(id).classList.contains('show');closePop();if(open)$(id).classList.add('show');wake()}
+$('bCC').onclick=e=>{e.stopPropagation();renderCC();togglePop('ccPop')};
+$('bQ').onclick=e=>{e.stopPropagation();renderQ();togglePop('qPop')};
+$('ccPop').addEventListener('click',e=>{e.stopPropagation();const c=e.target.closest('[data-cc]');if(c){setCC(+c.dataset.cc);setTimeout(closePop,150)}});
+$('qPop').addEventListener('click',e=>{e.stopPropagation();const q=e.target.closest('[data-q]');
+ if(q&&hls){hls.currentLevel=+q.dataset.q;$('quality').value=q.dataset.q;renderQ();toast('Quality: '+q.textContent);setTimeout(closePop,150)}});
+document.addEventListener('click',e=>{if(!e.target.closest('.pop,#bCC,#bQ'))closePop()});
+renderCC();renderQ();
 if(video.webkitShowPlaybackTargetPicker&&!/Chrome|CriOS|Android/.test(navigator.userAgent)){$('bCast').hidden=false;$('bCast').innerHTML=ICON.airplay;$('bCast').title='AirPlay';$('bCast').setAttribute('aria-label','AirPlay')}
 
 // phones: move fullscreen + PiP to the top-left and cast + volume to the top-right, like the iPhone player
